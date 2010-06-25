@@ -6,6 +6,7 @@ use parent 'TeaTime::Schema::Result';
 
 use CLASS;
 
+CLASS->table('tea_times');
 CLASS->load_components('TimeStamp');
 
 CLASS->add_columns(
@@ -22,6 +23,7 @@ CLASS->add_columns(
    },
 );
 
-CLASS->belongs_to( tea => 'TeaTime::Schema::Result::Tea' );
+CLASS->set_primary_key('id');
+CLASS->belongs_to( tea => 'TeaTime::Schema::Result::Tea', 'tea_id' );
 
 1;

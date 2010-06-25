@@ -1,10 +1,12 @@
 package TeaTime::Schema::Result::Tea;
 
 use 5.12.1;
+use warnings;
 
 use parent 'TeaTime::Schema::Result';
 
 use CLASS;
+CLASS->table('teas');
 
 CLASS->add_columns(
    id => {
@@ -15,8 +17,15 @@ CLASS->add_columns(
       data_type => 'varchar',
       size      => 50,
    },
+   enabled => {
+      data_type => 'integer',
+      size      => 1,
+   },
 );
 
-CLASS->has_many( tea_times => 'TeaTime::Schema::Result::TeaTime' );
+CLASS->set_primary_key('id');
+CLASS->has_many( tea_times => 'TeaTime::Schema::Result::TeaTime', 'tea_id' );
+CLASS->add_unique_constraint([qw( name )]);
+sub toggle { $_[0]->enabled($_[0]->enabled?0:1); $_[0] }
 
 1;
