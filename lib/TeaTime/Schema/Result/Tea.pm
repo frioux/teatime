@@ -7,6 +7,7 @@ use parent 'TeaTime::Schema::Result';
 
 use CLASS;
 CLASS->table('teas');
+CLASS->load_components(qw(KiokuDB));
 
 CLASS->add_columns(
    id => {
@@ -21,7 +22,13 @@ CLASS->add_columns(
       data_type => 'integer',
       size      => 1,
    },
+   metadata => {
+      data_type => 'varchar',
+      is_nullable => 1,
+   },
 );
+
+CLASS->kiokudb_column('metadata');
 
 CLASS->set_primary_key('id');
 CLASS->has_many( tea_times => 'TeaTime::Schema::Result::TeaTime', 'tea_id' );
