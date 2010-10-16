@@ -59,6 +59,9 @@ sub dispatch {
             enabled => 1,
          })
       }
+      when ('rand') {
+         say $tea_rs->enabled->rand->single->name;
+      }
       when ('list') {
          given ($args->[1]) {
             when ('teas') {
@@ -94,7 +97,7 @@ sub dispatch {
       }
       default {
          print <<'USAGE';
- perl teatime init|set $tea|clear|create $tea|list|toggle $tea|server
+ perl teatime init|set $tea|clear|create $tea|list|toggle $tea|server|rand|undo
 USAGE
       }
    }
