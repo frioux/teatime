@@ -42,9 +42,15 @@ sub dispatch {
          $tea_rs->delete; $tea_time_rs->delete
       }
       when ('undo') {
-         say $tea_time_rs->search(undef, {
+         my $t = $tea_time_rs->search(undef, {
             order_by => { -desc => 'when_occured' }
-         })->first->when_occured->ymd;
+         })->first;
+         if ($args->[1]) {
+            say 'undoing last tea time: ' . $t->when_occured->ymd . ', ' . $t->tea->name;
+            $t->delete;
+         } else {
+            say 'would undo last tea time: ' . $t->when_occured->ymd . ', ' . $t->tea->name;
+         }
       }
       when ('create') {
          $tea_rs->create({
