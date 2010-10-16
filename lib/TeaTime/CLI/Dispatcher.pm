@@ -9,14 +9,14 @@ my $tea_rs = $schema->resultset('Tea');
 my $tea_time_rs = $schema->resultset('TeaTime');
 
 sub single_tea {
-   my $action = $_[0];
-   my $name   = $_[1];
+   my ($action, $name, $tea_rs) = @_;
+
    my $teas = $tea_rs->cli_find($name);
    my $count = $teas->count;
    if ($count > 1) {
       say 'More than one tea found:';
       my $x = 0;
-      print join '', map ++$x . '. ' . $_->name . "\n", $teas->all;
+      print join '', map sprintf("%2d. %s\n", ++$x, $_->name), $teas->all;
       exit 1;
    } elsif ($count == 1) {
       $action->($teas->single)
@@ -36,10 +36,15 @@ sub dispatch {
          single_tea(sub {
             say 'Setting tea to ' . $_[0]->name;
             $tea_time_rs->create({ tea_id => $_[0]->id })
-         }, $args->[1]);
+         }, $args->[1], $tea_rs->enabled);
       }
       when ('clear') {
          $tea_rs->delete; $tea_time_rs->delete
+      }
+      when ('undo') {
+         say $tea_time_rs->search(undef, {
+            order_by => { -desc => 'when_occured' }
+         })->first->when_occured->ymd;
       }
       when ('create') {
          $tea_rs->create({
@@ -50,11 +55,9 @@ sub dispatch {
       when ('list') {
          given ($args->[1]) {
             when ('teas') {
-               say $_->name for $tea_rs->search({
-                  enabled => 1
-               }, {
-                  order_by => 'name'
-               })->all
+               my $x = 0;
+               print join '', map sprintf("%2d. %s\n", ++$x, $_->name),
+                  $tea_rs->search(undef, { order_by => 'name' })->all
             }
             when ('times') {
                say sprintf '%s: %s', $_->when_occured->ymd, $_->tea->name
@@ -68,9 +71,9 @@ sub dispatch {
       }
       when ('toggle') {
          single_tea(sub {
-            say 'Toggling ' . $_[0]->name . ' to ' . (!$_[0]->enabled?'disabled':'enabled');
+            say 'Toggling ' . $_[0]->name . ' to ' . ($_[0]->enabled?'disabled':'enabled');
             $_[0]->toggle->update;
-         }, $args->[1]);
+         }, $args->[1], $tea_rs);
       }
       when ('server') {
          require Plack::Runner;
