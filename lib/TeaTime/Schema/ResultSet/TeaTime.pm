@@ -21,6 +21,7 @@ sub stats {
       select       => [qw(tea.name), { count => 'tea.name' }],
       as           => [qw(name count)],
       result_class => 'DBIx::Class::ResultClass::HashRefInflator',
+      order_by     => { -desc => \'count(tea.name)' }
    })
 }
 

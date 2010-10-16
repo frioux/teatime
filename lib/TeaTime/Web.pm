@@ -4,6 +4,7 @@ use Web::Simple 'TeaTime::Web';
 
    use JSON ();
    use TeaTime::Schema;
+   use Time::Duration;
    my $schema = TeaTime::Schema->connect('dbi:SQLite:dbname=.teadb');
    my $tea_rs = $schema->resultset('Tea');
    my $tea_time_rs = $schema->resultset('TeaTime');
@@ -23,17 +24,18 @@ use Web::Simple 'TeaTime::Web';
    }
 
    sub main {
-      _fromat([ $tea_time_rs->in_order->format->all ])
+      my $t = time;
+      _fromat([ map +{
+            name => $_->tea->name,
+            when => $_->when_occured->ymd,
+            human => duration($t - $_->when_occured->epoch),
+      }, $tea_time_rs->in_order->all ])
    }
 
    sub teas {
       _fromat([
          map +{
             name => $_->name,
-            #($_->metadata?(
-               #time => $_->metadata->time,
-               #heaping => $_->metadata->is_heaping,
-            #):())
          }, $tea_rs->search(undef, { order_by => 'name' })->all
       ])
    }
@@ -45,7 +47,7 @@ use Web::Simple 'TeaTime::Web';
    }
 
    sub stats {
-      _fromat([ $tea_time_rs->in_order->stats->all ])
+      _fromat([ $tea_time_rs->stats->all ])
    }
 
    dispatch {
