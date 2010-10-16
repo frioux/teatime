@@ -1,29 +1,27 @@
 package TeaTime::Schema::Result::TeaTime;
 
-use 5.12.1;
+use DBIx::Class::Candy
+   -base => 'TeaTime::Schema::Result',
+   -components => ['TimeStamp'],
+   -perl5 => v12;
 
-use parent 'TeaTime::Schema::Result';
+table 'tea_times';
 
-use CLASS;
+column id => {
+   data_type         => 'integer',
+   is_auto_increment => 1,
+};
 
-CLASS->table('tea_times');
-CLASS->load_components('TimeStamp');
+column tea_id => {
+   data_type => 'integer',
+};
 
-CLASS->add_columns(
-   id => {
-      data_type         => 'integer',
-      is_auto_increment => 1,
-   },
-   tea_id => {
-      data_type => 'integer',
-   },
-   when_occured => {
-      data_type     => 'timestamp',
-      set_on_create => 1,
-   },
-);
+column when_occured => {
+   data_type     => 'timestamp',
+   set_on_create => 1,
+};
 
-CLASS->set_primary_key('id');
-CLASS->belongs_to( tea => 'TeaTime::Schema::Result::Tea', 'tea_id' );
+primary_key 'id';
+belongs_to tea => 'TeaTime::Schema::Result::Tea', 'tea_id';
 
 1;
