@@ -9,13 +9,14 @@ use Web::Simple 'TeaTime::Web';
    my $tea_time_rs = $schema->resultset('TeaTime');
 
    sub _fromat {
+      my $s = 'http://valium.lan.mitsi.com:8320';
        [
          200,
          [ 'Content-type', 'application/json' ],
          [
             JSON::encode_json( {
                data => $_[0],
-               see_also => [qw(/stats /current_tea /last_teas /teas)],
+               see_also => [split / /, qq($s/stats $s/current_tea $s/last_teas $s/teas)],
             })
          ]
        ]
