@@ -4,7 +4,7 @@ use 5.12.1;
 
 use TeaTime::Schema;
 
-my $schema = TeaTime::Schema->connect('.teadb');
+my $schema = TeaTime::Schema->connect('dbi:SQLite:dbname=.teadb');
 my $tea_rs = $schema->resultset('Tea');
 my $tea_time_rs = $schema->resultset('TeaTime');
 
@@ -42,6 +42,7 @@ sub dispatch {
                      order_by => 'when_occured'
                   })->all
             }
+            default { say 'you need to list teas or list times!'; exit 1 }
          }
       }
       when ('toggle') {
