@@ -3,8 +3,9 @@ package TeaTime::CLI::Dispatcher;
 use 5.12.1;
 
 use TeaTime::Schema;
+use FindBin;
 
-my $schema = TeaTime::Schema->connect('dbi:SQLite:dbname=.teadb');
+my $schema = TeaTime::Schema->connect("dbi:SQLite:dbname=$FindBin::Bin/../.teadb");
 my $tea_rs = $schema->resultset('Tea');
 my $tea_time_rs = $schema->resultset('TeaTime');
 
