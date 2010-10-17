@@ -8,6 +8,7 @@ use FindBin;
 my $schema = TeaTime::Schema->connect("dbi:SQLite:dbname=$FindBin::Bin/../.teadb");
 my $tea_rs = $schema->resultset('Tea');
 my $tea_time_rs = $schema->resultset('TeaTime');
+use List::Util 'sum';
 
 sub single_tea {
    my ($action, $name, $tea_rs) = @_;
@@ -61,6 +62,12 @@ sub dispatch {
       }
       when ('rand') {
          say $tea_rs->enabled->rand->single->name;
+      }
+      when ('like-rand') {
+         my @teas = $tea_time_rs->search({ 'tea.enabled' => 1 })->stats->all;
+         @teas = map { ($_) x $_->{count} } @teas;
+         my $t = $teas[rand @teas];
+         say $t->{name};
       }
       when ('list') {
          given ($args->[1]) {
