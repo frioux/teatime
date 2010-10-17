@@ -63,11 +63,16 @@ sub dispatch {
       when ('rand') {
          say $tea_rs->enabled->rand->single->name;
       }
-      when ('like-rand') {
+      when ('most-rand') {
          my @teas = $tea_time_rs->search({ 'tea.enabled' => 1 })->stats->all;
          @teas = map { ($_) x $_->{count} } @teas;
-         my $t = $teas[rand @teas];
-         say $t->{name};
+         say $teas[rand @teas]->{name};
+      }
+      when ('least-rand') {
+         my @teas = $tea_time_rs->search({ 'tea.enabled' => 1 })->stats->all;
+         my $lcm = multilcm(map $_->{count}, @teas);
+         @teas = map { ($_) x ($lcm/$_->{count}) } @teas;
+         say $teas[rand @teas]->{name};
       }
       when ('list') {
          given ($args->[1]) {
@@ -108,6 +113,29 @@ sub dispatch {
 USAGE
       }
    }
+}
+
+# http://www.perlmonks.org/?node_id=56906
+sub gcf {
+  my ($x, $y) = @_;
+  ($x, $y) = ($y, $x % $y) while $y;
+  return $x;
+}
+
+sub lcm {
+  return($_[0] * $_[1] / gcf($_[0], $_[1]));
+}
+
+sub multigcf {
+  my $x = shift;
+  $x = gcf($x, shift) while @_;
+  return $x;
+}
+
+sub multilcm {
+  my $x = shift;
+  $x = lcm($x, shift) while @_;
+  return $x;
 }
 
 1;
