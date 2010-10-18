@@ -27,7 +27,7 @@ use Web::Simple 'TeaTime::Web';
       my $t = time;
       _fromat([ map +{
             name => $_->tea->name,
-            when => $_->when_occured->ymd,
+            when => $_->get_column('when_occured'),
             human => duration($t - $_->when_occured->epoch),
       }, $tea_time_rs->in_order->all ])
    }
