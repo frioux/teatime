@@ -93,8 +93,8 @@ sub dispatch {
          $cl->reg_cb (
             session_ready => sub {
                $cl->send_message (
-                  "YAAAAY" => 'frewfrewfrewfrew1234@gmail.com'
-               );
+                  'T: ' . $tea_time_rs->in_order->first->tea->name => $_
+               ) for $contact_rs->enabled->get_column('jid')->all;
                $cl->reg_cb(send_buffer_empty => sub { $cl->disconnect });
             },
             disconnect => sub { $j->broadcast },
