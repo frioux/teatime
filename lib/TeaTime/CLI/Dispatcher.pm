@@ -120,7 +120,11 @@ sub dispatch {
                      order_by => 'when_occured'
                   })->all
             }
-            default { say 'you need to list teas or list times!'; exit 1 }
+            when ('contacts') {
+               my $x = 0;
+               print map ++$x . '. ' . $_ . "\n", $contact_rs->get_column('jid')->all
+            }
+            default { say 'you need to list teas or list times or list contacts!'; exit 1 }
          }
       }
       when ('toggle') {
