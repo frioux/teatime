@@ -8,9 +8,10 @@ use Web::Simple 'TeaTime::Web';
    my $schema = TeaTime::Schema->connect('dbi:SQLite:dbname=.teadb');
    my $tea_rs = $schema->resultset('Tea');
    my $tea_time_rs = $schema->resultset('TeaTime');
+   my $host;
 
    sub _fromat {
-      my $s = 'http://valium.lan.mitsi.com:8320';
+      my $s = 'http://' . $host;
        [
          200,
          [ 'Content-type', 'application/json' ],
@@ -51,11 +52,16 @@ use Web::Simple 'TeaTime::Web';
    }
 
    dispatch {
-      sub (/)            { $self->main        },
-      sub (/last_teas)   { $self->main        },
-      sub (/teas)        { $self->teas        },
-      sub (/stats)       { $self->stats       },
-      sub (/current_tea) { $self->current_tea },
+      sub () {
+         $host = $_[PSGI_ENV]->{HTTP_HOST};
+         subdispatch sub { [
+            sub (/)            { $self->main        },
+            sub (/last_teas)   { $self->main        },
+            sub (/teas)        { $self->teas        },
+            sub (/stats)       { $self->stats       },
+            sub (/current_tea) { $self->current_tea },
+         ] }
+      }
    };
 }
 
