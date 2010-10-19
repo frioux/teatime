@@ -32,7 +32,7 @@ sub dispatch {
    my $args = $_[1];
    given ($args->[0]) {
       when ('init') {
-         $schema->deploy
+         $schema->deploy({ (( $args->[1] == 2 )?( sources => ['Contact'] ):()) })
       }
       when ('set') {
          single_tea(sub {
