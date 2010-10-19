@@ -8,6 +8,7 @@ use FindBin;
 my $schema = TeaTime::Schema->connect("dbi:SQLite:dbname=$FindBin::Bin/../.teadb");
 my $tea_rs = $schema->resultset('Tea');
 my $tea_time_rs = $schema->resultset('TeaTime');
+my $contact_rs = $schema->resultset('Contact');
 use List::Util 'sum';
 
 sub single_tea {
@@ -40,9 +41,6 @@ sub dispatch {
             $tea_time_rs->create({ tea_id => $_[0]->id })
          }, $args->[1], $tea_rs->enabled);
       }
-      when ('clear') {
-         $tea_rs->delete; $tea_time_rs->delete
-      }
       when ('undo') {
          my $t = $tea_time_rs->search(undef, {
             order_by => { -desc => 'when_occured' }
@@ -55,10 +53,21 @@ sub dispatch {
          }
       }
       when ('create') {
-         $tea_rs->create({
-            name => $args->[1],
-            enabled => 1,
-         })
+         given ($args->[1]) {
+            when ('tea') {
+               $tea_rs->create({
+                  name => $args->[2],
+                  enabled => 1,
+               })
+            }
+            when ('contact') {
+               $contact_rs->create({
+                  jid => $args->[2],
+                  enabled => 1,
+               })
+            }
+            default { say 'you need to create tea or create contact!'; exit 1 }
+         }
       }
       when ('rand') {
          say $tea_rs->enabled->rand->single->name;
@@ -112,10 +121,21 @@ sub dispatch {
          }
       }
       when ('toggle') {
-         single_tea(sub {
-            say 'Toggling ' . $_[0]->name . ' to ' . ($_[0]->enabled?'disabled':'enabled');
-            $_[0]->toggle->update;
-         }, $args->[1], $tea_rs);
+         given ($args->[1]) {
+            when ('tea') {
+               single_tea(sub {
+                  say 'Toggling ' . $_[0]->name . ' to ' . ($_[0]->enabled?'disabled':'enabled');
+                  $_[0]->toggle->update;
+               }, $args->[2], $tea_rs);
+            }
+            when ('contact') {
+               single_tea(sub {
+                  say 'Toggling ' . $_[0]->jid . ' to ' . ($_[0]->enabled?'disabled':'enabled');
+                  $_[0]->toggle->update;
+               }, $args->[2], $contact_rs);
+            }
+            default { say 'you need to toggle tea or toggle contact!'; exit 1 }
+         }
       }
       when ('server') {
          require Plack::Runner;

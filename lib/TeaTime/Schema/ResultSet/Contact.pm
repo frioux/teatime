@@ -6,7 +6,7 @@ __PACKAGE__->load_components(qw(
    Helper::ResultSet::Random
 ));
 
-sub cli_find { $_[0]->search({ name => { -like => "%$_[1]%" } }) }
+sub cli_find { $_[0]->search({ jid => { -like => "%$_[1]%" } }) }
 
 sub enabled { $_[0]->search({ enabled => 1}) }
 
