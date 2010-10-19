@@ -74,6 +74,26 @@ sub dispatch {
          @teas = map { ($_) x ($lcm/$_->{count}) } @teas;
          say $teas[rand @teas]->{name};
       }
+      when ('ready') {
+         require AnyEvent;
+         require AnyEvent::XMPP::Client;
+
+         my $j = AnyEvent->condvar;
+         my $cl = AnyEvent::XMPP::Client->new();
+         $cl->add_account('frioux@gmail.com', 'password', 'talk.google.com', undef, { dont_retrieve_roster => 1 });
+         $cl->reg_cb (
+            session_ready => sub {
+               $cl->send_message (
+                  "YAAAAY" => 'frewfrewfrewfrew1234@gmail.com'
+               );
+               $cl->reg_cb(send_buffer_empty => sub { $cl->disconnect });
+            },
+            disconnect => sub { $j->broadcast },
+            error => sub { say "ERROR: " . $_[2]->string },
+         );
+         $cl->start;
+         $j->wait;
+      }
       when ('list') {
          given ($args->[1]) {
             when ('teas') {
