@@ -92,9 +92,12 @@ sub dispatch {
          $cl->add_account('frioux@gmail.com', 'password', 'talk.google.com', undef, { dont_retrieve_roster => 1 });
          $cl->reg_cb (
             session_ready => sub {
-               $cl->send_message (
-                  'T: ' . $tea_time_rs->in_order->first->tea->name => $_
-               ) for $contact_rs->enabled->get_column('jid')->all;
+               my $tea_msg = 'T: ' . $tea_time_rs->in_order->first->tea->name .
+                  ' (http://valium.lan.mitsi.com:8320)';
+               for ($contact_rs->enabled->get_column('jid')->all) {
+                  $cl->send_message($tea_msg, $_);
+                  say "Sending $tea_msg to $_";
+               }
                $cl->reg_cb(send_buffer_empty => sub { $cl->disconnect });
             },
             disconnect => sub { $j->broadcast },
