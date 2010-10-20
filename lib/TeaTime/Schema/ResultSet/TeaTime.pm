@@ -5,15 +5,6 @@ __PACKAGE__->load_components('Helper::ResultSet::IgnoreWantarray');
 
 sub in_order { $_[0]->search(undef, { order_by => { -desc => 'when_occured' } }) }
 
-sub format {
-   $_[0]->search(undef, {
-      join         => 'tea',
-      select       => [qw(when_occured tea.name)],
-      as           => [qw(when name)],
-      result_class => 'DBIx::Class::ResultClass::HashRefInflator',
-   })
-}
-
 sub stats {
    $_[0]->search(undef, {
       join         => 'tea',
