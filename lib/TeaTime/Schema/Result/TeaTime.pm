@@ -2,7 +2,9 @@ package TeaTime::Schema::Result::TeaTime;
 
 use DBIx::Class::Candy
    -base => 'TeaTime::Schema::Result',
+   -components => ['TimeStamp'],
    -perl5 => v12;
+
 use Time::Duration;
 
 table 'tea_times';
@@ -14,6 +16,11 @@ column id => {
 
 column tea_id => {
    data_type => 'integer',
+};
+
+column when_occured => {
+   data_type => 'timestamp',
+   set_on_create => 1,
 };
 
 primary_key 'id';
