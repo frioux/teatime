@@ -23,5 +23,6 @@ column when_occured => {
 
 primary_key 'id';
 belongs_to tea => 'TeaTime::Schema::Result::Tea', 'tea_id';
+has_many events => 'TeaTime::Schema::Result::Event', 'tea_time_id';
 
 1;
