@@ -30,6 +30,29 @@ sub single_item {
    }
 }
 
+sub send_message {
+   my $message = shift;
+   require AnyEvent;
+   require AnyEvent::XMPP::Client;
+
+   my $j = AnyEvent->condvar;
+   my $cl = AnyEvent::XMPP::Client->new();
+   $cl->add_account('frioux@gmail.com', 'password', 'talk.google.com', undef, { dont_retrieve_roster => 1 });
+   $cl->reg_cb (
+      session_ready => sub {
+         for ($contact_rs->enabled->get_column('jid')->all) {
+            $cl->send_message($message, $_);
+            say "Sending $message to $_";
+         }
+         $cl->reg_cb(send_buffer_empty => sub { $cl->disconnect });
+      },
+      disconnect => sub { $j->broadcast },
+      error => sub { say "ERROR: " . $_[2]->string },
+   );
+   $cl->start;
+   $j->wait;
+}
+
 sub dispatch {
    my $args = $_[1];
    given ($args->[0]) {
@@ -118,27 +141,11 @@ sub dispatch {
          say $teas[rand @teas]->{name};
       }
       when ('ready') {
-         require AnyEvent;
-         require AnyEvent::XMPP::Client;
-
-         my $j = AnyEvent->condvar;
-         my $cl = AnyEvent::XMPP::Client->new();
-         $cl->add_account('frioux@gmail.com', 'password', 'talk.google.com', undef, { dont_retrieve_roster => 1 });
-         $cl->reg_cb (
-            session_ready => sub {
-               my $tea_msg = 'T: ' . $tea_time_rs->in_order->first->tea->name .
-                  ' (http://valium.lan.mitsi.com:8320)';
-               for ($contact_rs->enabled->get_column('jid')->all) {
-                  $cl->send_message($tea_msg, $_);
-                  say "Sending $tea_msg to $_";
-               }
-               $cl->reg_cb(send_buffer_empty => sub { $cl->disconnect });
-            },
-            disconnect => sub { $j->broadcast },
-            error => sub { say "ERROR: " . $_[2]->string },
-         );
-         $cl->start;
-         $j->wait;
+         $tea_time_rs->in_order->first->events->create({
+            type => { name => 'Ready' }
+         });
+         send_message('Tea ready: ' . $tea_time_rs->in_order->first->tea->name .
+            ' (http://valium.lan.mitsi.com:8320)');
       }
       when ('list') {
          given ($args->[1]) {
