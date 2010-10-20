@@ -63,14 +63,13 @@ sub dispatch {
             }
             when (3) {
                $schema->deploy({ sources => [qw(Event EventType)] });
-               my $id = $event_type_rs->cli_find('chose')->first->id;
                my $rs = $tea_time_rs->search(undef, {
                   '+select' => 'when_occured',
                   '+as' => 'when',
                });
                for ($rs->all) {
                   $_->add_to_events({
-                     type_id => $id,
+                     type => { name => 'Chose Tea' },
                      when_occurred => $_->get_column('when'),
                   });
                }
