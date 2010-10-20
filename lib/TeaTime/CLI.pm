@@ -78,6 +78,33 @@ sub dispatch {
             default { $schema->deploy }
          }
       }
+      when ('timer') {
+         my $seconds = $args->[1];
+         $tea_time_rs->in_order->first->events->create({
+            type => { name => 'Started Steep' }
+         });
+         require AnyEvent;
+         my $j = AnyEvent->condvar;
+         my $once;
+         my $x;
+         my $w; $w = AnyEvent->timer (
+            interval => 1,
+            cb       => sub {
+               say $seconds--;
+               if ($seconds < 0 && !$once) {
+                  use Term::ReadKey;
+                  ReadMode 4; # Turn off controls keys
+                  1 while !defined ReadKey(-1);
+                  ReadMode 0; # Reset tty mode before exiting
+                  $tea_time_rs->in_order->first->events->create({
+                     type => { name => 'Stopped Steep' }
+                  });
+                  $j->broadcast
+               }
+            }
+         );
+         $j->wait;
+      }
       when ('set') {
          given ($args->[1]) {
             when ('tea') {
