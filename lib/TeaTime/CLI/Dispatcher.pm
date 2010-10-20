@@ -9,22 +9,23 @@ my $schema = TeaTime::Schema->connect("dbi:SQLite:dbname=$FindBin::Bin/../.teadb
 my $tea_rs = $schema->resultset('Tea');
 my $tea_time_rs = $schema->resultset('TeaTime');
 my $contact_rs = $schema->resultset('Contact');
+my $event_type_rs = $schema->resultset('EventType');
 use List::Util 'sum';
 
-sub single_tea {
-   my ($action, $name, $tea_rs) = @_;
+sub single_item {
+   my ($action, $name, $arg, $rs) = @_;
 
-   my $teas = $tea_rs->cli_find($name);
-   my $count = $teas->count;
+   $rs = $rs->cli_find($arg);
+   my $count = $rs->count;
    if ($count > 1) {
-      say 'More than one tea found:';
+      say "More than one $name found:";
       my $x = 0;
-      print join '', map sprintf("%2d. %s\n", ++$x, $_->name), $teas->all;
+      print join '', map sprintf("%2d. %s\n", ++$x, $_->view), $rs->all;
       exit 1;
    } elsif ($count == 1) {
-      $action->($teas->single)
+      $action->($rs->single)
    } else {
-      say "No tea with with name «$name» found";
+      say "No $name «$arg» found";
       exit 1;
    }
 }
@@ -44,10 +45,18 @@ sub dispatch {
          }
       }
       when ('set') {
-         single_tea(sub {
-            say 'Setting tea to ' . $_[0]->name;
-            $tea_time_rs->create({ tea_id => $_[0]->id })
-         }, $args->[1], $tea_rs->enabled);
+         given ($args->[1]) {
+            when ('tea') {
+               single_item(sub {
+                  say 'Setting tea to ' . $_[0]->name;
+                  $tea_time_rs->create({ tea_id => $_[0]->id })
+               }, 'tea', $args->[2], $tea_rs->enabled);
+            }
+            when ('event') {
+
+            }
+            default { say 'you must set tea or set event!'; exit 1 }
+         }
       }
       when ('undo') {
          my $t = $tea_time_rs->search(undef, {
@@ -73,6 +82,9 @@ sub dispatch {
                   jid => $args->[2],
                   enabled => 1,
                })
+            }
+            when ('event') {
+               $event_type_rs->create({ name => $args->[2] })
             }
             default { say 'you need to create tea or create contact!'; exit 1 }
          }
@@ -138,16 +150,16 @@ sub dispatch {
       when ('toggle') {
          given ($args->[1]) {
             when ('tea') {
-               single_tea(sub {
+               single_item(sub {
                   say 'Toggling ' . $_[0]->name . ' to ' . ($_[0]->enabled?'disabled':'enabled');
                   $_[0]->toggle->update;
-               }, $args->[2], $tea_rs);
+               }, 'tea', $args->[2], $tea_rs);
             }
             when ('contact') {
-               single_tea(sub {
+               single_item(sub {
                   say 'Toggling ' . $_[0]->jid . ' to ' . ($_[0]->enabled?'disabled':'enabled');
                   $_[0]->toggle->update;
-               }, $args->[2], $contact_rs);
+               }, 'contact', $args->[2], $contact_rs);
             }
             default { say 'you need to toggle tea or toggle contact!'; exit 1 }
          }

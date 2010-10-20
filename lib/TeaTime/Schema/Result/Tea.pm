@@ -25,4 +25,6 @@ unique_constraint [qw( name )];
 
 sub toggle { $_[0]->enabled($_[0]->enabled?0:1); $_[0] }
 
+sub view { $_[0]->name }
+
 1;
