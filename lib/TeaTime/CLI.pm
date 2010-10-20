@@ -140,6 +140,11 @@ sub dispatch {
          @teas = map { ($_) x ($lcm/$_->{count}) } @teas;
          say $teas[rand @teas]->{name};
       }
+      when ('empty') {
+         $tea_time_rs->in_order->first->events->create({
+            type => { name => 'Pot Empty' }
+         });
+      }
       when ('ready') {
          $tea_time_rs->in_order->first->events->create({
             type => { name => 'Ready' }
