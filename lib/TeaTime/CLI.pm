@@ -82,8 +82,17 @@ sub dispatch {
          given ($args->[1]) {
             when ('tea') {
                single_item(sub {
-                  say 'Setting tea to ' . $_[0]->name;
-                  $tea_time_rs->create({ tea_id => $_[0]->id })
+                  my $tt;
+                  my $tea = $_[0];
+                  $schema->txn_do(sub {
+                     $tt = $tea_time_rs->create({ tea_id => $tea->id });
+                     $tt->events->create({
+                        type => { name => 'Chose Tea' }
+                     });
+                  });
+                  say 'Setting tea to ' . $tea->name;
+                  send_message('Tea chosen: ' . $tt->tea->name .
+                     ' (http://valium.lan.mitsi.com:8320)');
                }, 'tea', $args->[2], $tea_rs->enabled);
             }
             when ('event') {
