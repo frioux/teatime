@@ -1,4 +1,4 @@
-package TeaTime::CLI::Dispatcher;
+package TeaTime::CLI;
 
 use 5.12.1;
 
