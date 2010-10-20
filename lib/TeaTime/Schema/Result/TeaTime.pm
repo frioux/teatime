@@ -36,7 +36,9 @@ sub TO_JSON {
          name => $_->type->name,
          when => $_->get_column('when_occurred'),
          human => duration($t - $_->when_occurred->epoch),
-      }, $self->events->all],
+      }, $self->events
+         ->search(undef, { order_by => { -desc => 'when_occurred' } })
+         ->all],
    }
 }
 
