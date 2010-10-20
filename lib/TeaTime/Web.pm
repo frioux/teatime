@@ -29,6 +29,7 @@ use Web::Simple 'TeaTime::Web';
       _fromat([ map +{
             name => $_->tea->name,
             when => $_->get_column('when_occured'),
+            events => [map +{ name => $_->type->name, when => $_->get_column('when_occurred')}, $_->events],
             human => duration($t - $_->when_occured->epoch),
       }, $tea_time_rs->in_order->all ])
    }

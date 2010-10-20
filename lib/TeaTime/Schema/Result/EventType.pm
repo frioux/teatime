@@ -23,6 +23,8 @@ unique_constraint ['name'];
 
 has_many events => 'TeaTime::Schema::Result::Event', 'type_id';
 
+sub view { $_[0]->name }
+
 1;
 
 

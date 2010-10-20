@@ -53,7 +53,10 @@ sub dispatch {
                }, 'tea', $args->[2], $tea_rs->enabled);
             }
             when ('event') {
-
+               single_item(sub {
+                  say 'Setting event to ' . $_[0]->name;
+                  $tea_time_rs->in_order->first->add_to_events({ type_id => $_[0]->id })
+               }, 'event', $args->[2], $event_type_rs);
             }
             default { say 'you must set tea or set event!'; exit 1 }
          }
@@ -143,6 +146,10 @@ sub dispatch {
             when ('contacts') {
                my $x = 0;
                print map ++$x . '. ' . $_ . "\n", $contact_rs->get_column('jid')->all
+            }
+            when ('events') {
+               my $x = 0;
+               print map ++$x . '. ' . $_ . "\n", $event_type_rs->get_column('name')->all
             }
             default { say 'you need to list teas or list times or list contacts!'; exit 1 }
          }
