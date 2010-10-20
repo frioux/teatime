@@ -33,7 +33,15 @@ sub dispatch {
    my $args = $_[1];
    given ($args->[0]) {
       when ('init') {
-         $schema->deploy({ (( $args->[1] == 2 )?( sources => ['Contact'] ):()) })
+         given ($args->[1]) {
+            when (2) {
+               $schema->deploy({ sources => ['Contact'] })
+            }
+            when (3) {
+               $schema->deploy({ sources => [qw(Event EventType)] })
+            }
+            default { $schema->deploy }
+         }
       }
       when ('set') {
          single_tea(sub {
