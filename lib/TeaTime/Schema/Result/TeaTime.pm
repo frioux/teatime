@@ -30,7 +30,7 @@ has_many events => 'TeaTime::Schema::Result::Event', 'tea_time_id';
 sub TO_JSON {
    my $self = shift;
    my $t = time;
-   return +{
+   my $ret = {
       name => $self->tea->name,
       events => [map +{
          name => $_->type->name,
@@ -39,7 +39,29 @@ sub TO_JSON {
       }, $self->events
          ->search(undef, { order_by => { -desc => 'when_occurred' } })
          ->all],
-   }
+   };
+
+   my $events = $self->events->search(undef, { join => 'type' });
+
+   my $chose = $events->search({ 'type.name' => 'Chose Tea'     })->next;
+   my $ready = $events->search({ 'type.name' => 'Ready'         })->next;
+   my $start = $events->search({ 'type.name' => 'Started Steep' })->next;
+   my $stop  = $events->search({ 'type.name' => 'Stopped Steep' })->next;
+   my $empty = $events->search({ 'type.name' => 'Pot Empty'     })->next;
+
+   $ret->{preparation_time} = (($chose && $ready)
+      ? duration($ready->when_occurred->epoch - $chose->when_occurred->epoch)
+      : undef);
+
+   $ret->{steep_time} = (($start && $stop)
+      ? duration($stop->when_occurred->epoch - $start->when_occurred->epoch)
+      : undef);
+
+   $ret->{available_time} = (($ready && $empty)
+      ? duration($ready->when_occurred->epoch - $empty->when_occurred->epoch)
+      : undef);
+
+   return $ret;
 }
 
 1;
