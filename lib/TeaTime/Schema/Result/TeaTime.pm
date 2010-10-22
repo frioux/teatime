@@ -6,6 +6,7 @@ use DBIx::Class::Candy
    -perl5 => v12;
 
 use Time::Duration;
+use List::Util 'first';
 
 table 'tea_times';
 
@@ -30,24 +31,27 @@ has_many events => 'TeaTime::Schema::Result::Event', 'tea_time_id';
 sub TO_JSON {
    my $self = shift;
    my $t = time;
+
+   my @events = $self->events->search(undef, {
+      prefetch => 'type',
+      order_by => { -desc => 'when_occurred' },
+   })->all;
+
    my $ret = {
       name => $self->tea->name,
       events => [map +{
          name => $_->type->name,
          when => $_->get_column('when_occurred'),
          human => duration($t - $_->when_occurred->epoch),
-      }, $self->events
-         ->search(undef, { order_by => { -desc => 'when_occurred' } })
-         ->all],
+      }, @events],
    };
 
-   my $events = $self->events->search(undef, { join => 'type' });
 
-   my $chose = $events->search({ 'type.name' => 'Chose Tea'     })->next;
-   my $ready = $events->search({ 'type.name' => 'Ready'         })->next;
-   my $start = $events->search({ 'type.name' => 'Started Steep' })->next;
-   my $stop  = $events->search({ 'type.name' => 'Stopped Steep' })->next;
-   my $empty = $events->search({ 'type.name' => 'Pot Empty'     })->next;
+   my $chose = first { $_->type->name eq 'Chose Tea'     } @events;
+   my $ready = first { $_->type->name eq 'Ready'         } @events;
+   my $start = first { $_->type->name eq 'Started Steep' } @events;
+   my $stop  = first { $_->type->name eq 'Stopped Steep' } @events;
+   my $empty = first { $_->type->name eq 'Pot Empty'     } @events;
 
    $ret->{preparation_time} = (($chose && $ready)
       ? duration($ready->when_occurred->epoch - $chose->when_occurred->epoch)
