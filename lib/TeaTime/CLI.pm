@@ -4,6 +4,7 @@ use 5.12.1;
 
 use TeaTime::Schema;
 use FindBin;
+use List::Util::WeightedChoice 'choose_weighted';
 
 my $schema = TeaTime::Schema->connect("dbi:SQLite:dbname=$FindBin::Bin/../.teadb");
 my $tea_rs = $schema->resultset('Tea');
@@ -166,14 +167,17 @@ sub dispatch {
       }
       when ('most-rand') {
          my @teas = $tea_time_rs->search({ 'tea.enabled' => 1 })->stats->all;
-         @teas = map { ($_) x $_->{count} } @teas;
-         say $teas[rand @teas]->{name};
+         say choose_weighted(
+            [map $_->{name}, @teas],
+            [map $_->{count}, @teas]
+         )
       }
       when ('least-rand') {
          my @teas = $tea_time_rs->search({ 'tea.enabled' => 1 })->stats->all;
-         my $lcm = multilcm(map $_->{count}, @teas);
-         @teas = map { ($_) x ($lcm/$_->{count}) } @teas;
-         say $teas[rand @teas]->{name};
+         say choose_weighted(
+            [map $_->{name}, @teas],
+            [map 1/$_->{count}, @teas]
+         )
       }
       when ('empty') {
          $tea_time_rs->in_order->first->events->create({
@@ -245,29 +249,6 @@ sub dispatch {
 USAGE
       }
    }
-}
-
-# http://www.perlmonks.org/?node_id=56906
-sub gcf {
-  my ($x, $y) = @_;
-  ($x, $y) = ($y, $x % $y) while $y;
-  return $x;
-}
-
-sub lcm {
-  return($_[0] * $_[1] / gcf($_[0], $_[1]));
-}
-
-sub multigcf {
-  my $x = shift;
-  $x = gcf($x, shift) while @_;
-  return $x;
-}
-
-sub multilcm {
-  my $x = shift;
-  $x = lcm($x, shift) while @_;
-  return $x;
 }
 
 1;
