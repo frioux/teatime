@@ -4,6 +4,7 @@ use 5.12.1;
 
 use TeaTime::Schema;
 use FindBin;
+use Time::Duration;
 
 my $schema = TeaTime::Schema->connect("dbi:SQLite:dbname=$FindBin::Bin/../.teadb");
 my $tea_rs = $schema->resultset('Tea');
@@ -235,6 +236,38 @@ sub dispatch {
          $runner->parse_options(@args);
          $runner->set_options(argv => \@args);
          $runner->run;
+      }
+      when ('play') {
+      use Devel::Dwarn;
+         Dwarn [map {
+            +{
+               %{$_},
+               total_time => duration($_->{total_time}),
+               steep_time => duration($_->{steep_time}),
+               preparation_time => duration($_->{preparation_time}),
+               available_time => duration($_->{available_time}),
+            }
+
+         } $tea_time_rs->search({
+               'type.name'   => 'Chose Tea',
+               'type_2.name' => 'Started Steep',
+               'type_3.name' => 'Stopped Steep',
+               'type_4.name' => 'Ready',
+               'type_5.name' => 'Pot Empty',
+         }, {
+            group_by  => 'me.id',
+            join      => ['tea', ({'events' => 'type' } ) x 5 ],
+            'select' => [
+               'tea.name',
+               \'AVG(strftime("%s", events_5.when_occurred) - strftime("%s", events.when_occurred))',
+               \'AVG(strftime("%s", events_4.when_occurred) - strftime("%s", events.when_occurred))',
+               \'AVG(strftime("%s", events_5.when_occurred) - strftime("%s", events_4.when_occurred))',
+               \'AVG(strftime("%s", events_3.when_occurred) - strftime("%s", events_2.when_occurred))',
+            ],
+            'as',    => ['name', 'total_time', 'preparation_time', 'available_time', 'steep_time'],
+         })->search(undef, {
+            result_class => 'DBIx::Class::ResultClass::HashRefInflator'
+         })->all];
       }
       default {
          print <<'USAGE';
