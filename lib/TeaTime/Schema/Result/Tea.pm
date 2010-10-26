@@ -34,4 +34,13 @@ sub toggle { $_[0]->enabled($_[0]->enabled?0:1); $_[0] }
 
 sub view { $_[0]->name }
 
+sub TO_JSON {
+   my $self = shift;
+   return +{
+      name => $self->name,
+      ( defined $self->steep_time ? ( steep_time => $self->steep_time . ' seconds' ) : () ),
+      heaping => ($self->heaping ? \1 : \0 ),
+   }
+}
+
 1;

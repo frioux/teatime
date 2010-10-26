@@ -4,7 +4,6 @@ use 5.12.1;
 
 use TeaTime::Schema;
 use FindBin;
-use List::Util::WeightedChoice 'choose_weighted';
 
 my $schema = TeaTime::Schema->connect("dbi:SQLite:dbname=$FindBin::Bin/../.teadb");
 my $tea_rs = $schema->resultset('Tea');
@@ -172,23 +171,6 @@ sub dispatch {
             }
             default { say 'you need to create tea or create contact!'; exit 1 }
          }
-      }
-      when ('rand') {
-         say $tea_rs->enabled->rand->single->name;
-      }
-      when ('most-rand') {
-         my @teas = $tea_time_rs->search({ 'tea.enabled' => 1 })->stats->all;
-         say choose_weighted(
-            [map $_->{name}, @teas],
-            [map $_->{count}, @teas]
-         )
-      }
-      when ('least-rand') {
-         my @teas = $tea_time_rs->search({ 'tea.enabled' => 1 })->stats->all;
-         say choose_weighted(
-            [map $_->{name}, @teas],
-            [map 1/$_->{count}, @teas]
-         )
       }
       when ('empty') {
          $tea_time_rs->in_order->first->events->create({
