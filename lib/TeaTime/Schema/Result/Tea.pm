@@ -21,6 +21,11 @@ column enabled => {
    size      => 1,
 };
 
+column heaping => {
+   data_type => 'integer',
+   size      => 1,
+};
+
 primary_key 'id';
 has_many tea_times => 'TeaTime::Schema::Result::TeaTime', 'tea_id';
 unique_constraint [qw( name )];

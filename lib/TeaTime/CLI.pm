@@ -80,6 +80,11 @@ sub dispatch {
                   $_[1]->do('ALTER TABLE teas ADD COLUMN steep_time INT');
                });
             }
+            when (5) {
+               $schema->storage->dbh_do(sub {
+                  $_[1]->do('ALTER TABLE teas ADD COLUMN heaping INT');
+               });
+            }
             default { $schema->deploy }
          }
       }
@@ -122,7 +127,7 @@ sub dispatch {
                         type => { name => 'Chose Tea' }
                      });
                   });
-                  say 'Setting tea to ' . $tea->name;
+                  say 'Setting tea to ' . $tea->name . ($tea->heaping ? ' (heaping)' : '');
                   send_message('Tea chosen: ' . $tt->tea->name .
                      ' (http://valium.lan.mitsi.com:8320)');
                }, 'tea', $args->[2], $tea_rs->enabled);

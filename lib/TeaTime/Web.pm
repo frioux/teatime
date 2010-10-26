@@ -29,7 +29,8 @@ use Web::Simple 'TeaTime::Web';
       _fromat([
          map +{
             name => $_->name,
-            steep_time => ( $_->steep_time || '' ) . ' seconds',
+            ( defined $_->steep_time ? ( steep_time => $_->steep_time . ' seconds' ) : () ),
+            heaping => ($_->heaping ? \1 : \0 ),
          }, $tea_rs->search(undef, { order_by => 'name' })->all
       ])
    }
