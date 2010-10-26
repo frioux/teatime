@@ -39,7 +39,7 @@ use Web::Simple 'TeaTime::Web';
             JSON::encode_json( {
                data => $_[0],
                see_also => [split /\s+/, qq($s/stats $s/current_tea $s/last_teas $s/teas
-                  $s/most_rand $s/least_rand $s/rand
+                  $s/rand/most $s/rand/least $s/rand
                )],
             })
          ]
@@ -70,8 +70,8 @@ use Web::Simple 'TeaTime::Web';
             sub (/stats)       { $self->stats       },
             sub (/current_tea) { $self->current_tea },
             sub (/rand)        { $self->rand        },
-            sub (/most_rand)   { $self->most_rand   },
-            sub (/least_rand)  { $self->least_rand  },
+            sub (/rand/most)   { $self->most_rand   },
+            sub (/rand/least)  { $self->least_rand  },
          ] }
       }
    };
