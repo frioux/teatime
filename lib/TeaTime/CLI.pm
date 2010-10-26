@@ -75,11 +75,16 @@ sub dispatch {
                   });
                }
             }
+            when (4) {
+               $schema->storage->dbh_do(sub {
+                  $_[1]->do('ALTER TABLE teas ADD COLUMN steep_time INT');
+               });
+            }
             default { $schema->deploy }
          }
       }
       when ('timer') {
-         my $seconds = $args->[1];
+         my $seconds = $args->[1] || $tea_time_rs->in_order->first->tea->steep_time;
          $tea_time_rs->in_order->first->events->create({
             type => { name => 'Started Steep' }
          });
@@ -147,6 +152,7 @@ sub dispatch {
             when ('tea') {
                $tea_rs->create({
                   name => $args->[2],
+                  steep_time => $args->[3],
                   enabled => 1,
                })
             }

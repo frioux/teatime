@@ -14,6 +14,8 @@ column name => {
    size      => 50,
 };
 
+column steep_time => { data_type => 'int' };
+
 column enabled => {
    data_type => 'integer',
    size      => 1,
