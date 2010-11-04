@@ -5,6 +5,7 @@ use Web::Simple 'TeaTime::Web';
    use JSON ();
    use TeaTime::Schema;
    use List::Util::WeightedChoice 'choose_weighted';
+   use Time::Duration;
    my $schema = TeaTime::Schema->connect('dbi:SQLite:dbname=.teadb');
    my $tea_rs = $schema->resultset('Tea');
    my $tea_time_rs = $schema->resultset('TeaTime');
@@ -49,8 +50,18 @@ use Web::Simple 'TeaTime::Web';
    sub main { _fromat([ map $_->TO_JSON, $tea_time_rs->in_order->all ]) }
 
    sub teas {
+      my $t = time;
       _fromat([
-         map $_->TO_JSON, $tea_rs->search(undef, { order_by => 'name' })->all
+         map +{
+            %{ $_->TO_JSON },
+            last_drank => duration($t - $_->get_column('last_drank')),
+         }, $tea_rs->search(undef, {
+            order_by  => 'name',
+            group_by  => 'me.id',
+            join      => { tea_times => 'events' },
+            '+select' => \'MAX(strftime("%s", events.when_occurred))',
+            '+as'     => 'last_drank',
+         })->all
       ])
    }
 
