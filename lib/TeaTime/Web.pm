@@ -59,7 +59,11 @@ use Web::Simple 'TeaTime::Web';
             order_by  => 'name',
             group_by  => 'me.id',
             join      => { tea_times => 'events' },
-            '+select' => \'MAX(strftime("%s", events.when_occurred))',
+            '+select' => {
+               max => {
+                  strftime => [ '"%s"', 'events.when_occurred' ]
+               }
+            },
             '+as'     => 'last_drank',
          })->all
       ])
