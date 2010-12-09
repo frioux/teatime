@@ -17,6 +17,7 @@ my $event_type_rs = $schema->resultset('EventType');
 sub schema { $schema }
 sub tea_rs { $tea_rs }
 sub tea_time_rs { $tea_time_rs }
+sub contact_rs { $contact_rs }
 
 sub single_item {
    my ($self, $action, $name, $arg, $rs) = @_;
