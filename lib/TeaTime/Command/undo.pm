@@ -7,6 +7,8 @@ use warnings;
 
 sub abstract { 'undo the last set_tea' }
 
+sub usage_desc { 't undo [--force]' }
+
 sub execute {
   my ($self, $opt, $args) = @_;
 

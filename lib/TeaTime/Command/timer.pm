@@ -6,6 +6,8 @@ use warnings;
 
 sub abstract { 'run timer for last set tea' }
 
+sub usage_desc { 't timer [time]' }
+
 sub execute {
   my ($self, $opt, $args) = @_;
 

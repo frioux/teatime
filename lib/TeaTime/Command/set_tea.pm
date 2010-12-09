@@ -7,6 +7,8 @@ use warnings;
 
 sub abstract { 'set tea' }
 
+sub usage_desc { 't set_tea <name>' }
+
 sub execute {
   my ($self, $opt, $args) = @_;
 

@@ -7,6 +7,8 @@ use warnings;
 
 sub abstract { 'toggle contact' }
 
+sub usage_desc { 't toggle_contact <contact>' }
+
 sub execute {
   my ($self, $opt, $args) = @_;
 
