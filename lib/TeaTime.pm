@@ -37,7 +37,7 @@ sub single_item {
 }
 
 sub send_message {
-   my ($self, $message) = shift;
+   my ($self, $message) = @_;
    require AnyEvent;
    require AnyEvent::XMPP::Client;
 
