@@ -128,7 +128,7 @@ sub dispatch {
                   });
                   say 'Setting tea to ' . $tea->name . ($tea->heaping ? ' (heaping)' : '');
                   send_message('Tea chosen: ' . $tt->tea->name .
-                     ' (http://valium.lan.mitsi.com:8320)');
+                     ' (http://valium.lan.mitsi.com:8320) (http://akama.lan.mitsi.com:5000)');
                }, 'tea', $args->[2], $tea_rs->enabled);
             }
             when ('event') {
@@ -182,7 +182,7 @@ sub dispatch {
             type => { name => 'Ready' }
          });
          send_message('Tea ready: ' . $tea_time_rs->in_order->first->tea->name .
-            ' (http://valium.lan.mitsi.com:8320)');
+            ' (http://valium.lan.mitsi.com:8320) (http://akama.lan.mitsi.com:5000)');
       }
       when ('list') {
          given ($args->[1]) {
