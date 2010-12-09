@@ -1,9 +1,7 @@
 #!/usr/bin/env perl
 
-use 5.12.1;
+use rlib;
 use FindBin;
-use lib "$FindBin::Bin/../lib";
-use TeaTime::CLI;
+use TeaTime;
 
-TeaTime::CLI->dispatch(\@ARGV);
-
+TeaTime->run;
