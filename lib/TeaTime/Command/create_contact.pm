@@ -21,7 +21,9 @@ sub execute {
   $self->app->contact_rs->create({
     jid => $args->[0],
     enabled => 1,
-  })
+  });
+
+  say "created $args->[0]";
 }
 
 1;
