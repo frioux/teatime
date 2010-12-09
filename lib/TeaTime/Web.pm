@@ -54,7 +54,7 @@ use Web::Simple 'TeaTime::Web';
       _fromat([
          map +{
             %{ $_->TO_JSON },
-            last_drank => duration($t - $_->get_column('last_drank')),
+            last_drank => ($_->get_column('last_drank')?duration($t - $_->get_column('last_drank')):undef),
          }, $tea_rs->search(undef, {
             order_by  => 'name',
             group_by  => 'me.id',

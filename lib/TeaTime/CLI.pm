@@ -157,6 +157,7 @@ sub dispatch {
                $tea_rs->create({
                   name => $args->[2],
                   steep_time => $args->[3],
+                  heaping    => $args->[4],
                   enabled => 1,
                })
             }
@@ -188,8 +189,8 @@ sub dispatch {
          given ($args->[1]) {
             when ('teas') {
                my $x = 0;
-               print join '', map sprintf("%2d. %s\n", ++$x, $_->name),
-                  $tea_rs->search(undef, { order_by => 'name' })->all
+               print join '', map sprintf("%2d. %s %s\n", ++$x, ($_->enabled?'*':' '), $_->name),
+                  $tea_rs->search(undef, { order_by => [{ -desc => 'enabled' }, 'name' ] })->all
             }
             when ('times') {
                say sprintf '%s: %s', $_->when_occured->ymd, $_->tea->name
