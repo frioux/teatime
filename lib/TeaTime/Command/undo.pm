@@ -5,6 +5,8 @@ use TeaTime -command;
 use 5.12.1;
 use warnings;
 
+sub abstract { 'undo the last set_tea' }
+
 sub execute {
   my ($self, $opt, $args) = @_;
 

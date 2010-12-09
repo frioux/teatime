@@ -5,6 +5,8 @@ use TeaTime -command;
 use 5.12.1;
 use warnings;
 
+sub abstract { 'print a list of contacts' }
+
 sub execute {
   my ($self, $opt, $args) = @_;
 

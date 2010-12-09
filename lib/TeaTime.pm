@@ -12,7 +12,6 @@ my $schema = TeaTime::Schema->connect("dbi:SQLite:dbname=$FindBin::Bin/../.teadb
 my $tea_rs = $schema->resultset('Tea');
 my $tea_time_rs = $schema->resultset('TeaTime');
 my $contact_rs = $schema->resultset('Contact');
-my $event_type_rs = $schema->resultset('EventType');
 
 sub schema { $schema }
 sub tea_rs { $tea_rs }
