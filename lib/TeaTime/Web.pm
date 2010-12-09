@@ -6,7 +6,7 @@ use Web::Simple 'TeaTime::Web';
    use TeaTime::Schema;
    use List::Util::WeightedChoice 'choose_weighted';
    use Time::Duration;
-   my $schema = TeaTime::Schema->connect('dbi:SQLite:dbname=.teadb');
+   my $schema = TeaTime::Schema->connect('dbi:SQLite:dbname=.teadb;sqlite_unicode=1');
    my $tea_rs = $schema->resultset('Tea');
    my $tea_time_rs = $schema->resultset('TeaTime');
    my $host;
@@ -35,7 +35,7 @@ use Web::Simple 'TeaTime::Web';
       my $s = 'http://' . $host;
        [
          200,
-         [ 'Content-type', 'application/json' ],
+         [ 'Content-type', 'application/json; charset=utf-8' ],
          [
             JSON::encode_json( {
                data => $_[0],
