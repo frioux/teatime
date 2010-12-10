@@ -10,12 +10,12 @@ sub abstract { 'mark pot as ready' }
 sub execute {
   my ($self, $opt, $args) = @_;
 
-  my $ttrs = $self->app->tea_time_rs;
+  my $tea_time = $self->app->tea_time_rs->in_order->first;
 
-  $ttrs->in_order->first->events->create({
+  $tea_time->events->create({
     type => { name => 'Ready' }
   });
-  $self->app->send_message('Tea ready: ' . $ttrs->first->tea->name .
+  $self->app->send_message('Tea ready: ' . $tea_time->tea->name .
     ' (http://valium.lan.mitsi.com:8320) (http://akama.lan.mitsi.com:5000)');
 }
 
