@@ -7,6 +7,14 @@ use warnings;
 
 sub abstract { 'initialize (and upgrade) database' }
 
+sub usage_desc { 't init [version]' }
+
+sub validate_args {
+  my ($self, $opt, $args) = @_;
+
+  $self->usage_error('init version must be an int') unless $args->[0] =~ /^\d+$/;
+}
+
 sub execute {
   my ($self, $opt, $args) = @_;
 
@@ -38,6 +46,7 @@ sub execute {
         $_[1]->do('ALTER TABLE teas ADD COLUMN heaping INT');
       });
     }
+    when (6) { $schema->deploy({ sources => [qw(Milk)] }) }
     default { $schema->deploy }
   }
 }
