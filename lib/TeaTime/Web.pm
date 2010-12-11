@@ -50,6 +50,8 @@ use Web::Simple 'TeaTime::Web';
 
    sub main { _fromat([ map $_->TO_JSON, $tea_time_rs->in_order->all ]) }
 
+   sub last { _fromat([ map $_->TO_JSON, $tea_time_rs->in_order->slice(0, 10)->all ]) }
+
    sub teas {
       my $t = time;
       _fromat([
@@ -78,7 +80,7 @@ use Web::Simple 'TeaTime::Web';
 
    dispatch {
       sub (/)            { $self->main        },
-      sub (/last_teas)   { $self->main        },
+      sub (/last_teas)   { $self->last        },
       sub (/teas)        { $self->teas        },
       sub (/stats)       { $self->stats       },
       sub (/current_tea) { $self->current_tea },
