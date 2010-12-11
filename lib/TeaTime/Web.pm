@@ -10,7 +10,6 @@ use Web::Simple 'TeaTime::Web';
    my $schema = TeaTime->schema;
    my $tea_rs = $schema->resultset('Tea');
    my $tea_time_rs = $schema->resultset('TeaTime');
-   my $host;
    my $base_url = TeaTime->config->{web_server}{base_url};
 
    sub rand {
@@ -34,7 +33,7 @@ use Web::Simple 'TeaTime::Web';
    }
 
    sub _fromat {
-      my $s = 'http://' . $host . $base_url;
+      my $s = $base_url;
        [
          200,
          [ 'Content-type', 'application/json; charset=utf-8' ],
@@ -78,19 +77,14 @@ use Web::Simple 'TeaTime::Web';
    sub stats { _fromat([ $tea_time_rs->stats->all ]) }
 
    dispatch {
-      sub () {
-         $host = $_[PSGI_ENV]->{HTTP_HOST};
-         subdispatch sub { [
-            sub (/)            { $self->main        },
-            sub (/last_teas)   { $self->main        },
-            sub (/teas)        { $self->teas        },
-            sub (/stats)       { $self->stats       },
-            sub (/current_tea) { $self->current_tea },
-            sub (/rand)        { $self->rand        },
-            sub (/rand/most)   { $self->most_rand   },
-            sub (/rand/least)  { $self->least_rand  },
-         ] }
-      }
+      sub (/)            { $self->main        },
+      sub (/last_teas)   { $self->main        },
+      sub (/teas)        { $self->teas        },
+      sub (/stats)       { $self->stats       },
+      sub (/current_tea) { $self->current_tea },
+      sub (/rand)        { $self->rand        },
+      sub (/rand/most)   { $self->most_rand   },
+      sub (/rand/least)  { $self->least_rand  },
    };
 }
 
