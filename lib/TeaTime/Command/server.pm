@@ -20,7 +20,7 @@ sub execute {
     '-I', "$FindBin::Bin/../lib",
     '-D',
     '-p', 8320,
-    '-o', 'valium.lan.mitsi.com'
+    '-o', $self->app->config->{web_server}{listen_on},
   );
   $runner->parse_options(@args);
   $runner->set_options(argv => \@args);

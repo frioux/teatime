@@ -2,14 +2,16 @@ use Web::Simple 'TeaTime::Web';
 {
    package TeaTime::Web;
 
+   use TeaTime;
    use JSON ();
    use TeaTime::Schema;
    use List::Util::WeightedChoice 'choose_weighted';
    use Time::Duration;
-   my $schema = TeaTime::Schema->connect('dbi:SQLite:dbname=.teadb;sqlite_unicode=1');
+   my $schema = TeaTime->schema;
    my $tea_rs = $schema->resultset('Tea');
    my $tea_time_rs = $schema->resultset('TeaTime');
    my $host;
+   my $base_url = TeaTime->config->{web_server}{base_url};
 
    sub rand {
       _fromat($tea_rs->enabled->rand->single->TO_JSON)
@@ -32,7 +34,7 @@ use Web::Simple 'TeaTime::Web';
    }
 
    sub _fromat {
-      my $s = 'http://' . $host;
+      my $s = 'http://' . $host . $base_url;
        [
          200,
          [ 'Content-type', 'application/json; charset=utf-8' ],

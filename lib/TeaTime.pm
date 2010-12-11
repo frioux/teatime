@@ -6,9 +6,16 @@ use 5.12.1;
 use warnings;
 
 use TeaTime::Schema;
-use FindBin;
+use JSON;
 
-my $schema = TeaTime::Schema->connect("dbi:SQLite:dbname=$FindBin::Bin/../.teadb");
+sub config {
+   state $config = decode_json(do {
+     local( @ARGV, $/ ) = 'config.json'; <>
+   });
+   $config
+}
+
+my $schema = TeaTime::Schema->connect(config->{db});
 my $tea_rs = $schema->resultset('Tea');
 my $tea_time_rs = $schema->resultset('TeaTime');
 my $contact_rs = $schema->resultset('Contact');
@@ -43,7 +50,10 @@ sub send_message {
 
    my $j = AnyEvent->condvar;
    my $cl = AnyEvent::XMPP::Client->new();
-   $cl->add_account('frioux@gmail.com', 'password', 'talk.google.com', undef, { dont_retrieve_roster => 1 });
+   $cl->add_account(
+     config->{xmpp}{jid}, config->{xmpp}{password}, config->{xmpp}{server},
+     undef, { dont_retrieve_roster => 1 }
+   );
    $cl->reg_cb (
       session_ready => sub {
          for ($contact_rs->enabled->get_column('jid')->all) {

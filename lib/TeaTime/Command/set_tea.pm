@@ -22,8 +22,12 @@ sub execute {
          });
       });
       say 'Setting tea to ' . $tea->name . ($tea->heaping ? ' (heaping)' : '');
-      $self->app->send_message('Tea chosen: ' . $tt->tea->name .
-         ' (http://valium.lan.mitsi.com:8320) (http://akama.lan.mitsi.com:5000)');
+      $self->app->send_message(
+        sprintf 'Tea chosen: %s (%s) (%s)',
+          $tea->name,
+          $self->app->config->{servers}{api},
+          $self->app->config->{servers}{human}
+      );
    }, 'tea', $args->[0], $self->app->tea_rs->enabled);
 }
 

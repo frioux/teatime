@@ -1,0 +1,16 @@
+{
+   "db":"dbi:SQLite:dbname=.teadb;sqlite_unicode=1",
+   "xmpp":{
+      "jid":"frioux@gmail.com",
+      "server":"talk.google.com",
+      "password":"password"
+   },
+   "servers":{
+      "api":"http://valium.lan.mitsi.com:8320",
+      "human":"http://akama.lan.mitsi.com:5000"
+   },
+   "web_server":{
+      "listen_on":"valium.lan.mitsi.com",
+      "base_url":"/api"
+   }
+}

@@ -15,8 +15,12 @@ sub execute {
   $tea_time->events->create({
     type => { name => 'Ready' }
   });
-  $self->app->send_message('Tea ready: ' . $tea_time->tea->name .
-    ' (http://valium.lan.mitsi.com:8320) (http://akama.lan.mitsi.com:5000)');
+  $self->app->send_message(
+    sprintf 'Tea ready: %s (%s) (%s)',
+      $tea_time->tea->name,
+      $self->app->config->{servers}{api},
+      $self->app->config->{servers}{human}
+  );
 }
 
 1;
