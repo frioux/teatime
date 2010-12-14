@@ -7,10 +7,14 @@ use warnings;
 
 use TeaTime::Schema;
 use JSON;
+use FindBin '$Bin';
+use List::Util 'first';
+use File::HomeDir;
 
 sub config {
    state $config = decode_json(do {
-     local( @ARGV, $/ ) = 'config.json'; <>
+     my $f = '.teatime.json';
+     local( @ARGV, $/ ) =  first { -f $_ } "$Bin/$f", File::HomeDir->my_home."/$f", $f; <>
    });
    $config
 }

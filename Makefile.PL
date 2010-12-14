@@ -16,6 +16,8 @@ requires 'AnyEvent';
 requires 'Term::ReadKey';
 requires 'DBIx::Class::Candy';
 requires 'DBIx::Class::TimeStamp';
+requires 'List::Util';
+requires 'File::HomeDir';
 
 install_script glob('script/*.pl');
 auto_install;
