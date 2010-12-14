@@ -14,7 +14,7 @@ use File::HomeDir;
 sub config {
    state $config = decode_json(do {
      my $f = '.teatime.json';
-     local( @ARGV, $/ ) =  first { -f $_ } "$Bin/$f", File::HomeDir->my_home."/$f", $f; <>
+     local( @ARGV, $/ ) =  first { -f $_ } "$Bin/$f", home()."/$f", $f; <>
    });
    $config
 }
