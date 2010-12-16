@@ -1,0 +1,143 @@
+=head1 NAME
+
+TeaTime: a CLI and L<half|/SEE ALSO> a webapp for tracking your teatimes!
+
+
+=head1 INSTALLING DEPS
+
+This program uses Perl and a number of Perl modules.  The easiest way
+to install the modules is: (skip this first bit if you perl it up regularly)
+
+ curl -L http://cpanmin.us | perl - --sudo App::cpanminus
+ cpanm --installdeps .
+
+=head1 INSTALLATION
+
+Next, what I intially did was added /home/frew/code/teatime to my path, but
+an alias is probably more sensible:
+
+ alias t=/home/frew/code/teatime/bin/tea
+
+=head1 CONFIGURATION
+
+If you want to use all of the features of teatime you need to set up a config
+file like the one included in this repo in your home directory.  The following
+is what the various bits of the config mean:
+
+=over 2
+
+=item C<db>
+
+the connect string for your database.  You probably just want to use SQLite.
+In which case C<dbi:SQLite:dbname=$file;sqlite_unicode=1> is sufficient.
+Note that if you B<do> want to use some other database for performance or
+something that is supported.
+
+=item C<xmpp>
+
+this allows will instant message people when the tea is chosen and marked
+as ready.  C<server> is the xmpp server, C<jid> is username, and C<password> is
+the password.
+
+=item C<servers>
+
+these are urls used in the xmpp messages
+
+=item C<web_server>
+
+C<listen_on>: the ip address to listen on this is only useful
+if you want to use the C<server> command to run a perl based server locally.
+The server is performant enough for serving up to the world, but once you do
+a full on deploy you probably want to use an init script or Ubic or something
+like that.
+
+C<base_url>: this gets prepended to all the links in C<see_also>. The
+main use is for if you've set up apache to proxy to this server or something
+and you want the links to work.
+
+=back
+
+=head1 USAGE
+
+For the most part the app level documentation (accessed by just running the
+program) is good enough, but I will give an overview of all the features
+here.
+
+A typical day in the use of this tool will go as follows:
+
+ # set the tea to hazelbank (send message to contacts in case they hate the tea)
+ t set_tea hazel
+
+ # start the timer after cleaning the pot etc
+ t timer
+
+ # mark the pot as ready (send message to tell people tea is ready)
+ t ready
+
+ # mark pot as empty (for statistics based on how quickly people drink tea)
+ t empty
+
+=head2 create_contact
+
+Create a contact for use with the XMPP send functions used when setting the tea
+and marking the pot as ready
+
+=head2 create_tea
+
+Create a new tea for drinking
+
+=head2 empty
+
+Mark the pot as empty
+
+=head2 init
+
+Generate a database
+
+=head2 list_contacts
+
+Print out a list of contacts
+
+=head2 list_teas
+
+Print out a list of teas
+
+=head2 list_times
+
+Print out a list of tea times
+
+=head2 new_milk
+
+Create a new milk for expiration tracking
+
+=head2 ready
+
+Mark a pot as ready
+
+=head2 server
+
+Start the built in server
+
+=head2 set_tea
+
+Set the current tea
+
+=head2 timer
+
+Run a timer for the current tea
+
+=head2 toggle_contact
+
+Enable/disable an XMPP contact
+
+=head2 toggle_tea
+
+Enalbe/disable a tea
+
+=head2 undo
+
+Undo the last tea you set
+
+=head1 SEE ALSO
+
+http://github.com/gedarling/teadash for the other half

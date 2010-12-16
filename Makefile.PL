@@ -18,6 +18,7 @@ requires 'DBIx::Class::Candy';
 requires 'DBIx::Class::TimeStamp';
 requires 'List::Util';
 requires 'File::HomeDir';
+requires 'SQL::Translator';
 
 install_script glob('script/*.pl');
 auto_install;
