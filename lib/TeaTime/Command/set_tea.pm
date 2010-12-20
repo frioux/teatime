@@ -25,7 +25,7 @@ sub execute {
     } elsif ($days == 2) {
       return ' [Milk expires in two days]'
     } elsif ($days < 0) {
-      return ' [Milk expired ' . $days . 'day(s) ago]'
+      return ' [Milk expired ' . $days . ' day(s) ago]'
     }
     return '';
   })->();
