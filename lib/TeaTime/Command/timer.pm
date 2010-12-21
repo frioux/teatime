@@ -11,30 +11,29 @@ sub usage_desc { 't timer [time]' }
 sub execute {
   my ($self, $opt, $args) = @_;
 
-  my $tea_time_rs = $self->app->tea_time_rs;
+  my $tea_time = $self->app->tea_time_rs->in_order->first;
 
-  my $seconds = $args->[0] || $tea_time_rs->in_order->first->tea->steep_time;
+  my $seconds = $args->[0] || $tea_time->tea->steep_time;
 
-  $tea_time_rs->in_order->first->events->create({
+  $tea_time->events->create({
      type => { name => 'Started Steep' }
   });
 
   $|++; # print immediately, not after a newline
   require AnyEvent;
   my $j = AnyEvent->condvar;
-  my $once;
-  my $x;
-  my $w; $w = AnyEvent->timer (
+  my $once = 0;
+  my $w = AnyEvent->timer (
      interval => 1,
      cb       => sub {
-        print "\r\x1b[J" . $seconds--;
-        if ($seconds < 0 && !$once) {
+        if ($seconds >= 0) {
+           print "\r\x1b[J" . $seconds--;
+        } elsif (!$once) {
            use Term::ReadKey;
            ReadMode 4; # Turn off controls keys
            print "\a"; # BEEP
            1 while !defined ReadKey(-1);
            ReadMode 0; # Reset tty mode before exiting
-           my $tea_time = $self->app->tea_time_rs->in_order->first;
            $tea_time->events->create({
               type => { name => 'Stopped Steep' }
            });
@@ -42,16 +41,18 @@ sub execute {
              type => { name => 'Ready' }
            });
            $self->app->send_message(
-             sprintf 'Tea ready: %s (%s) (%s)',
+             (sprintf 'Tea ready: %s (%s) (%s)',
                $tea_time->tea->name,
                $self->app->config->{servers}{api},
                $self->app->config->{servers}{human}
+             ),
+             $j
            );
-           $j->broadcast
+           $once = 1
         }
      }
   );
-  $j->wait;
+  $j->recv;
 }
 
 1;

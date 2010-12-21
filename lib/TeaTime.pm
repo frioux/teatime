@@ -52,7 +52,9 @@ sub send_message {
    require AnyEvent;
    require AnyEvent::XMPP::Client;
 
-   my $j = AnyEvent->condvar;
+   my $passed_j = $_[2];
+   my $j;
+   $j = AnyEvent->condvar unless $passed_j;
    my $cl = AnyEvent::XMPP::Client->new();
    $cl->add_account(
      config->{xmpp}{jid}, config->{xmpp}{password}, config->{xmpp}{server},
@@ -66,11 +68,11 @@ sub send_message {
          }
          $cl->reg_cb(send_buffer_empty => sub { $cl->disconnect });
       },
-      disconnect => sub { $j->broadcast },
+      disconnect => sub { if ($passed_j) { $passed_j->send } else { $j->send } },
       error => sub { say "ERROR: " . $_[2]->string },
    );
    $cl->start;
-   $j->wait;
+   $j->recv unless $passed_j;
 }
 
 1;
