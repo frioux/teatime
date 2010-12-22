@@ -1,15 +1,13 @@
-package TeaTime::Schema::Result;
+package TeaTime::Schema::ResultSet;
 
 use 5.12.1;
 use warnings;
 
-use parent 'DBIx::Class::Core';
+use parent 'DBIx::Class::ResultSet';
 
-sub insert {
-  my $self = shift;
-  return $self->next::method(@_)
-     if $self->result_source->storage->_dbic_connect_attributes->{writable}
-}
+__PACKAGE__->load_components(qw(
+   Helper::ResultSet::IgnoreWantarray
+));
 
 sub update {
   my $self = shift;
@@ -24,4 +22,3 @@ sub delete {
 }
 
 1;
-

@@ -1,7 +1,6 @@
 package TeaTime::Schema::ResultSet::TeaTime;
 
-use parent 'DBIx::Class::ResultSet';
-__PACKAGE__->load_components('Helper::ResultSet::IgnoreWantarray');
+use parent 'TeaTime::Schema::ResultSet';
 
 sub in_order { $_[0]->search(undef, { order_by => { -desc => 'when_occured' } }) }
 

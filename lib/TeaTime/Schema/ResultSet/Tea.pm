@@ -1,8 +1,7 @@
 package TeaTime::Schema::ResultSet::Tea;
 
-use parent 'DBIx::Class::ResultSet';
+use parent 'TeaTime::Schema::ResultSet';
 __PACKAGE__->load_components(qw(
-   Helper::ResultSet::IgnoreWantarray
    Helper::ResultSet::Random
 ));
 

@@ -1,10 +1,8 @@
 package TeaTime::Schema::ResultSet::Contact;
 
-use parent 'DBIx::Class::ResultSet';
-__PACKAGE__->load_components(qw(
-   Helper::ResultSet::IgnoreWantarray
-   Helper::ResultSet::Random
-));
+use parent 'TeaTime::Schema::ResultSet';
+
+__PACKAGE__->load_components('Helper::ResultSet::Random');
 
 sub cli_find { $_[0]->search({ jid => { -like => "%$_[1]%" } }) }
 

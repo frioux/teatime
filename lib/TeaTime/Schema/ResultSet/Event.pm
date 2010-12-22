@@ -1,10 +1,6 @@
 package TeaTime::Schema::ResultSet::Event;
 
-use parent 'DBIx::Class::ResultSet';
-
-__PACKAGE__->load_components(qw(
-   Helper::ResultSet::IgnoreWantarray
-));
+use parent 'TeaTime::Schema::ResultSet';
 
 sub chosen {
    shift->search({

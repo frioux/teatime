@@ -16,10 +16,19 @@ sub config {
      my $f = '.teatime.json';
      local( @ARGV, $/ ) =  first { -f $_ } "$Bin/$f", home()."/$f", $f; <>
    });
+
+   $config->{send_messages} //= exists $ENV{TXMPP} ? $ENV{TXMPP} : 1;
+
+   $config->{writable_db}   //= exists $ENV{TDB}   ? $ENV{TDB}   : 1;
+
    $config
 }
 
-my $schema = TeaTime::Schema->connect(config->{db});
+my $schema = TeaTime::Schema->connect({
+   dsn      => config->{db},
+   writable => config->{writable_db},
+});
+
 my $tea_rs = $schema->resultset('Tea');
 my $tea_time_rs = $schema->resultset('TeaTime');
 my $contact_rs = $schema->resultset('Contact');
@@ -63,7 +72,8 @@ sub send_message {
    $cl->reg_cb (
       session_ready => sub {
          for ($contact_rs->enabled->get_column('jid')->all) {
-            $cl->send_message($message, $_);
+            $cl->send_message($message, $_)
+               if $self->config->{send_messages};
             say "Sending $message to $_";
          }
          $cl->reg_cb(send_buffer_empty => sub { $cl->disconnect });
