@@ -90,6 +90,10 @@ Create a new tea for drinking
 
 Mark the pot as empty
 
+=head2 event
+
+Mark the pot with an arbitrary event
+
 =head2 init
 
 Generate a database
@@ -105,6 +109,10 @@ Print out a list of teas
 =head2 list_times
 
 Print out a list of tea times
+
+=head2 message
+
+Send an arbitrary message to contacts
 
 =head2 new_milk
 
