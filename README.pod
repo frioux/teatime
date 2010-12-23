@@ -162,6 +162,8 @@ Undo the last tea you set
 
 =head1 NEAT STUFF
 
+=head2 Second Steeping
+
 I haven't added second (or more) steep code to the codebase, but thanks to a
 few vanilla features and unix we can do it quite handily:
 
@@ -170,6 +172,60 @@ few vanilla features and unix we can do it quite handily:
  TDB=0 TXMPP=0 t timer 360
  t event "Stopped 2nd Steep"
  t message "Second Steep of $(t list_times | tail -n1 | cut -b13-) ready"
+
+=head2 Apache and teadash
+
+My coworker made L<teadash|http://github.com/gedarling/teadash>, which is a
+handy at-a-glance tool for the tea information.  Setting it up with Apache is
+great if you want to set up an external site L<like we did|http://t.mitsi.com>.
+
+First, configure C<teatime> and C<teadash>.  They can share a configuration
+file.  The following is the config file for our web server:
+
+ {
+   "db":"dbi:SQLite:dbname=/home/frew/.teadb;sqlite_unicode=1",
+   "web_server":{
+     "listen_on":"localhost",
+     "base_url":"http://t.mitsi.com/api"
+   },
+   "dash":{
+     "spec_file":"teatime.json",
+     "api_base_url":"http://localhost:5001/",
+     "webroot":"/home/frew/code/teadash/static"
+   }
+ }
+
+Note that I'm running the servers under my user.  This works fine as Apache
+will be proxying to them.  The main things to take note of are the
+C<web_server>, and C<dash> configs.  C<webserver.base_url> is so that the urls
+will work as links if people use C<JSONView>.  C<dash.api_base_url> is whatever
+url the api web server will be running on, and C<dash.webroot> is the full path
+to the static files in dash.
+
+As for the Apache config, all I did was the following:
+
+ <VirtualHost *:80>
+   ExpiresActive On
+   ProxyRequests Off
+   <Proxy balancer://dash>
+      BalancerMember http://127.0.0.1:5000
+   </Proxy>
+   <Proxy balancer://time>
+      BalancerMember http://127.0.0.1:5001
+   </Proxy>
+   ProxyPass /api/ balancer://time/
+   ProxyPass / balancer://dash/
+
+   DocumentRoot "/home/frew/code/teadash/static"
+   <Location /static>
+      SetOutputFilter DEFLATE
+      SetEnvIfNoCase Request_URI \.(?:gif|jpe?g|png)$ no-gzip dont-vary
+      SetHandler default-handler
+   </Location>
+
+ </VirtualHost>
+
+Works great!
 
 =head1 SEE ALSO
 
