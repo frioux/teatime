@@ -173,6 +173,25 @@ few vanilla features and unix we can do it quite handily:
  t event "Stopped 2nd Steep"
  t message "Second Steep of $(t list_times | tail -n1 | cut -b13-) ready"
 
+=head2 Ghetto replication for SQLite
+
+I still can't quite bring myself to deploy this on a real database.  SQLite
+is just so handy!  That means that I either need to run the CLI of teatime on a
+remote server or I need to syncronize SQLite over.  I wrote a handy shell
+function to syncronize the files over as needed.  If you do this make sure to
+run C<< ssh-copy-id $remote_host >> so that you won't have to type in a
+password all the time.
+
+ t() { tea $@ && [[ ( $1 == create_tea ) || \
+                    ( $1 == empty      ) || \
+                    ( $1 == ready      ) || \
+                    ( $1 == set_tea    ) || \
+                    ( $1 == timer      ) || \
+                    ( $1 == event      ) || \
+                    ( $1 == undo       ) \
+                 ]] && \
+       scp ~/.teadb frew@t.mitsi.com:/home/frew/.teadb }
+
 =head2 Apache and teadash
 
 My coworker made L<teadash|http://github.com/gedarling/teadash>, which is a
