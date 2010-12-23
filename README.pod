@@ -57,6 +57,20 @@ and you want the links to work.
 
 =back
 
+=head1 ENVIRONMENT VARIABLES
+
+=over 2
+
+=item C<TXMPP>
+
+Set this to false if you want to disable sending messages
+
+=item C<TDB>
+
+Set this to false if you want to disable writing to the database
+
+=back
+
 =head1 USAGE
 
 For the most part the app level documentation (accessed by just running the
@@ -145,6 +159,17 @@ Enalbe/disable a tea
 =head2 undo
 
 Undo the last tea you set
+
+=head1 NEAT STUFF
+
+I haven't added second (or more) steep code to the codebase, but thanks to a
+few vanilla features and unix we can do it quite handily:
+
+ t message "Second Steeping $(t list_times | tail -n1 | cut -b13-)"
+ t event "Starting 2nd Steep"
+ TDB=0 TXMPP=0 t timer 360
+ t event "Stopped 2nd Steep"
+ t message "Second Steep of $(t list_times | tail -n1 | cut -b13-) ready"
 
 =head1 SEE ALSO
 
