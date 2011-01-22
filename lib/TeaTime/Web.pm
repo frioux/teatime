@@ -97,6 +97,13 @@ sub dispatch_request {
          });
          _fromat({ success => 1 })
       },
+      sub (/events + ?name=) {
+         my ($self, $name) = @_;
+         $tea_time_rs->in_order->first->events->create({
+            type => { name => $name }
+         });
+         _fromat({ success => 1 })
+      },
    },
    sub (/contacts)   { _fromat([ map $_->TO_JSON, $schema->resultset('Contact')->all ]) },
 

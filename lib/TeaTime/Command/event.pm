@@ -18,9 +18,7 @@ sub validate_args {
 sub execute {
   my ($self, $opt, $args) = @_;
 
-   $self->app->tea_time_rs->in_order->first->events->create({
-      type => { name => $args->[0] }
-   });
+   $self->app->api->add_event($args->[0]);
 
    say "Adding event «$args->[0]» to pot";
 }
