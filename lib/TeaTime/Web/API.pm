@@ -52,6 +52,6 @@ sub add_tea {
 sub get_tea { _dejson($_[0]->_get('/teas')) }
 
 sub add_tea_time { $_[0]->_post('/teatime', { name => $_[1] }) }
-sub get_tea_times { $_[0]->_get('/teatime') }
+sub get_tea_times { _dejson($_[0]->_get('/last_teas')) }
 
 1;
