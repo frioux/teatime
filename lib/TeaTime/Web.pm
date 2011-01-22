@@ -104,6 +104,13 @@ sub dispatch_request {
          });
          _fromat({ success => 1 })
       },
+      sub (/milk + ?expiration=) {
+         my ($self, $expiration) = @_;
+         $schema->resultset('Milk')->create({
+            when_expires => "$expiration 00:00:00"
+         });
+         _fromat({ success => 1 })
+      },
    },
    sub (/contacts)   { _fromat([ map $_->TO_JSON, $schema->resultset('Contact')->all ]) },
 

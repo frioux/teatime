@@ -21,7 +21,7 @@ sub validate_args {
 sub execute {
   my ($self, $opt, $args) = @_;
 
-  $self->app->schema->resultset('Milk')->create({ when_expires => "$args->[0] 00:00:00" });
+  $self->app->api->add_milk($args->[0]);
 
   say "creating milk expiration date for $args->[0]";
 }

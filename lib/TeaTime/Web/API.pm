@@ -39,7 +39,7 @@ sub get_contacts { _dejson($_[0]->_get('/contacts')) }
 
 sub add_event { $_[0]->_post('/events', { name => $_[1] }) }
 
-sub add_milk { $_[0]->_post('/milk', { date => $_[1] }) }
+sub add_milk { $_[0]->_post('/milk', { expiration => $_[1] }) }
 sub get_milk { $_[0]->_get('/milk') }
 
 sub add_tea {
