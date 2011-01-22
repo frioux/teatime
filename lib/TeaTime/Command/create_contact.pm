@@ -18,10 +18,7 @@ sub validate_args {
 sub execute {
   my ($self, $opt, $args) = @_;
 
-  $self->app->contact_rs->create({
-    jid => $args->[0],
-    enabled => 1,
-  });
+  $self->app->api->add_contact( $args->[0] );
 
   say "created $args->[0]";
 }

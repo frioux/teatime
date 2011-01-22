@@ -78,13 +78,15 @@ sub stats { _fromat([ $tea_time_rs->stats->all ]) }
 sub dispatch_request {
 
    # need auth
-   sub (POST + /events + ?username=&password=&name=) {
-      my ($self, $username, $password, $name) = @_;
-      return redispatch_to '/' unless $username eq 'frew' && $password eq 'lol';
-
-      $self->app->tea_time_rs->in_order->first->events->create({
-         type => { name => $name }
-      })
+   sub (POST) {
+      sub (/contacts + ?jid=) {
+         my ($self, $jid) = @_;
+         $schema->resultset('Contact')->create({
+            enabled => 1,
+            jid => $jid
+         });
+         _fromat({ success => 1 })
+      },
    },
    sub (/contacts)   { _fromat([ map $_->TO_JSON, $schema->resultset('Contact')->all ]) },
 
