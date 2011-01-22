@@ -14,6 +14,7 @@ my @days = ();
 sub execute {
   my ($self, $opt, $args) = @_;
 
+  die 'this does not work with the web api yet';
   my %teas;
   $teas{$_->{tea}}[$_->{weekday}] = $_->{count} for $self->app->tea_time_rs->search(undef, {
     result_class => 'DBIx::Class::ResultClass::HashRefInflator',
