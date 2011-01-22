@@ -40,6 +40,7 @@ sub TO_JSON {
       name => $self->name,
       ( defined $self->steep_time ? ( steep_time => $self->steep_time . ' seconds' ) : () ),
       heaping => ($self->heaping ? \1 : \0 ),
+      enabled => ($self->enabled ? \1 : \0 ),
    }
 }
 
