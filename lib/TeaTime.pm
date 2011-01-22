@@ -10,6 +10,7 @@ use JSON;
 use FindBin '$Bin';
 use List::Util 'first';
 use File::HomeDir;
+use TeaTime::Web::API;
 
 sub config {
    state $config = decode_json(do {
@@ -32,6 +33,8 @@ my $schema = TeaTime::Schema->connect({
 my $tea_rs = $schema->resultset('Tea');
 my $tea_time_rs = $schema->resultset('TeaTime');
 my $contact_rs = $schema->resultset('Contact');
+
+sub api { TeaTime::Web::API->new }
 
 sub schema { $schema }
 sub tea_rs { $tea_rs }
