@@ -86,6 +86,7 @@ sub dispatch_request {
          type => { name => $name }
       })
    },
+   sub (/contacts)   { _fromat([ map $_->TO_JSON, $schema->resultset('Contact')->all ]) },
 
    # no auth
    sub (/last_teas)   { $_[0]->last        },

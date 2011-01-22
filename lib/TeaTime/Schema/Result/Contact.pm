@@ -1,6 +1,7 @@
 package TeaTime::Schema::Result::Contact;
 
-use DBIx::Class::Candy -base => 'TeaTime::Schema::Result', -perl5 => v12;
+use DBIx::Class::Candy -base => 'TeaTime::Schema::Result', -perl5 => v12,
+   -components => [ 'Helper::Row::ToJSON' ];
 
 table 'contacts';
 

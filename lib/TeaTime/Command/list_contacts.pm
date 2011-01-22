@@ -11,7 +11,7 @@ sub execute {
   my ($self, $opt, $args) = @_;
 
   my $x = 0;
-  print map ++$x . '. ' . $_ . "\n", $self->app->contact_rs->get_column('jid')->all
+  print map ++$x . '. ' . $_->{jid} . "\n", @{$self->app->api->get_contacts}
 }
 
 1;

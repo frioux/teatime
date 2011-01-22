@@ -35,7 +35,7 @@ sub _put    { $_[0]->http_tiny->request( PUT    => $_[0]->_build_url($_[1], $_[2
 sub _delete { $_[0]->http_tiny->request( DELETE => $_[0]->_build_url($_[1], $_[2]) ) }
 
 sub add_contact { $_[0]->_post('/contacts', { jid => $_[1] }) }
-sub get_contacts { $_[0]->_get('/contacts') }
+sub get_contacts { _dejson($_[0]->_get('/contacts')) }
 
 sub add_event { $_[0]->_post('/events', { name => $_[1] }) }
 
