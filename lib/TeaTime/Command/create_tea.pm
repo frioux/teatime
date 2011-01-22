@@ -19,12 +19,7 @@ sub validate_args {
 sub execute {
   my ($self, $opt, $args) = @_;
 
-  $self->app->tea_rs->create({
-    name       => $args->[0],
-    steep_time => $args->[1],
-    heaping    => $args->[2],
-    enabled    => 1,
-  });
+  $self->app->api->add_tea( $args->[0], $args->[1], $args->[2] );
 
   say "created $args->[0]";
 }

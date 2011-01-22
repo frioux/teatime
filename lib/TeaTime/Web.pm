@@ -87,6 +87,16 @@ sub dispatch_request {
          });
          _fromat({ success => 1 })
       },
+      sub (/teas + ?name=&steep_time=&is_heaping=) {
+         my ($self, $name, $steep_time, $heaping) = @_;
+         $schema->resultset('Tea')->create({
+            name => $name,
+            steep_time => $steep_time,
+            heaping => $heaping,
+            enabled => 1,
+         });
+         _fromat({ success => 1 })
+      },
    },
    sub (/contacts)   { _fromat([ map $_->TO_JSON, $schema->resultset('Contact')->all ]) },
 
