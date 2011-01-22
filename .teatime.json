@@ -1,5 +1,5 @@
 {
-   "db":"dbi:SQLite:dbname=.teadb;sqlite_unicode=1",
+   "db":"dbi:SQLite:dbname=/home/frew/.teadb;sqlite_unicode=1",
    "xmpp":{
       "jid":"frioux@gmail.com",
       "server":"talk.google.com",

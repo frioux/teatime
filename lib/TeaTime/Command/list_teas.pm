@@ -11,10 +11,9 @@ sub execute {
   my ($self, $opt, $args) = @_;
 
   my $x = 0;
-  print join '', map sprintf("%2d. %s %s\n", ++$x, ($_->enabled?'*':' '), $_->name),
-    $self->app->tea_rs->search(undef, {
-      order_by => [{ -desc => 'enabled' }, 'name' ]
-    })->all
+  print join '', map sprintf("%2d. %s %s\n", ++$x, ($_->{enabled}?'*':' '), $_->{name}),
+    sort { $b->{enabled} cmp $a->{enabled} or $a->{name} cmp $b->{name} }
+    @{$self->app->api->get_tea},
 }
 
 1;
