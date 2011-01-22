@@ -76,7 +76,18 @@ sub current_tea {
 sub stats { _fromat([ $tea_time_rs->stats->all ]) }
 
 sub dispatch_request {
-   sub (/)            { $_[0]->main        },
+
+   # need auth
+   sub (POST + /events + ?username=&password=&name=) {
+      my ($self, $username, $password, $name) = @_;
+      return redispatch_to '/' unless $username eq 'frew' && $password eq 'lol';
+
+      $self->app->tea_time_rs->in_order->first->events->create({
+         type => { name => $name }
+      })
+   },
+
+   # no auth
    sub (/last_teas)   { $_[0]->last        },
    sub (/teas)        { $_[0]->teas        },
    sub (/stats)       { $_[0]->stats       },
