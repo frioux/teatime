@@ -11,13 +11,11 @@ sub usage_desc { 't timer [time]' }
 sub execute {
   my ($self, $opt, $args) = @_;
 
-  my $tea_time = $self->app->tea_time_rs->in_order->first;
+  my $tea_time = $self->app->api->get_current_tea_time;
 
-  my $seconds = $args->[0] || $tea_time->tea->steep_time;
+  my $seconds = $args->[0] || $tea_time->{prescribed_steep_time};
 
-  $tea_time->events->create({
-     type => { name => 'Started Steep' }
-  });
+  $self->app->api->add_event('Started Steep');
 
   $|++; # print immediately, not after a newline
   require AnyEvent;
@@ -34,15 +32,11 @@ sub execute {
            print "\a"; # BEEP
            1 while !defined ReadKey(-1);
            ReadMode 0; # Reset tty mode before exiting
-           $tea_time->events->create({
-              type => { name => 'Stopped Steep' }
-           });
-           $tea_time->events->create({
-             type => { name => 'Ready' }
-           });
+           $self->app->api->add_event('Stopped Steep');
+           $self->app->api->add_event('Ready');
            $self->app->send_message(
              (sprintf 'Tea ready: %s (%s) (%s)',
-               $tea_time->tea->name,
+               $tea_time->{name},
                $self->app->config->{servers}{api},
                $self->app->config->{servers}{human}
              ),

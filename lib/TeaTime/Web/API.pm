@@ -55,5 +55,6 @@ sub add_tea_time {
    decode_json($_[0]->_post('/current_tea', { tea => $_[1] })->{content})
 }
 sub get_tea_times { _dejson($_[0]->_get('/last_teas')) }
+sub get_current_tea_time { _dejson($_[0]->_get('/current_tea')) }
 
 1;

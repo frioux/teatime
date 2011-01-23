@@ -39,6 +39,7 @@ sub TO_JSON {
 
    my $ret = {
       name => $self->tea->name,
+      prescribed_steep_time => $self->tea->steep_time,
       events => [map +{
          name => $_->type->name,
          when => $_->get_column('when_occurred'),
