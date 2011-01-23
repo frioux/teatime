@@ -111,6 +111,41 @@ sub dispatch_request {
          });
          _fromat({ success => 1 })
       },
+      sub (/current_tea + ?tea=) {
+         my ($self, $tea_name) = @_;
+
+         my $rs = $schema->resultset('Tea')->cli_find($tea_name);
+         my $count = $rs->count;
+         if ($count > 1) {
+            return _fromat({
+               success => 0,
+               err_code => 2,
+               message => 'More than one tea found',
+               teas    => [map $_->view, $rs->all],
+            });
+         } elsif ($count == 1) {
+            my $tea = $rs->first;
+            $schema->txn_do(sub {
+              my $tt = $tea_time_rs->create({ tea_id => $tea->id });
+              $tt->events->create({
+                type => { name => 'Chose Tea' }
+              });
+            });
+            return _fromat({
+               success => 1,
+               tea => $tea->TO_JSON,
+               milk => $schema->resultset('Milk')->in_order->get_column('when_expires')->first,
+               message => 'Setting tea to ' . $tea->name
+                  . ($tea->heaping ? ' (heaping)' : ''),
+               });
+         } else {
+            return _fromat({
+               success => 0,
+               err_code => 0,
+               message => "No tea '$tea_name' found",
+            });
+         }
+      }
    },
    sub (/contacts)   { _fromat([ map $_->TO_JSON, $schema->resultset('Contact')->all ]) },
 
