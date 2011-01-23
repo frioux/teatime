@@ -1,15 +1,21 @@
 package TeaTime::Web;
 use Web::Simple;
 
-use TeaTime;
+use TeaTime::Util 'config';
 use JSON ();
 use TeaTime::Schema;
 use List::Util::WeightedChoice 'choose_weighted';
 use Time::Duration;
-my $schema = TeaTime->schema;
+use TeaTime::Schema;
+
+my $schema = TeaTime::Schema->connect({
+   dsn      => config->{db},
+   writable => config->{writable_db},
+});
+
 my $tea_rs = $schema->resultset('Tea');
 my $tea_time_rs = $schema->resultset('TeaTime');
-my $base_url = TeaTime->config->{web_server}{base_url};
+my $base_url = config->{web_server}{base_url};
 
 sub rand { _fromat($tea_rs->enabled->rand->single->TO_JSON) }
 
