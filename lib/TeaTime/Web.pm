@@ -81,79 +81,105 @@ sub current_tea {
 
 sub stats { _fromat([ $tea_time_rs->stats->all ]) }
 
+use MIME::Base64;
+use Crypt::Eksblowfish::Bcrypt 'bcrypt_hash';
+
+sub verify_password {
+   my %valid = %{shift @_};
+   my %check = %{shift @_};
+
+   my $salt = (split /;/, $valid{password})[1];
+
+   my $encoded = encode_base64(bcrypt_hash({
+      key_nul => 1,
+      cost    => 8,
+      salt    => $salt,
+   }, $check{password}), '');
+
+   return $check{user} eq $valid{user} && "$encoded;$salt" eq $valid{password}
+}
 sub dispatch_request {
-
    # need auth
-   sub (POST) {
-      sub (/contacts + ?jid=) {
-         my ($self, $jid) = @_;
-         $schema->resultset('Contact')->create({
-            enabled => 1,
-            jid => $jid
-         });
-         _fromat({ success => 1 })
-      },
-      sub (/teas + ?name=&steep_time=&is_heaping=) {
-         my ($self, $name, $steep_time, $heaping) = @_;
-         $schema->resultset('Tea')->create({
-            name => $name,
-            steep_time => $steep_time,
-            heaping => $heaping,
-            enabled => 1,
-         });
-         _fromat({ success => 1 })
-      },
-      sub (/events + ?name=) {
-         my ($self, $name) = @_;
-         $tea_time_rs->in_order->first->events->create({
-            type => { name => $name }
-         });
-         _fromat({ success => 1 })
-      },
-      sub (/milk + ?expiration=) {
-         my ($self, $expiration) = @_;
-         $schema->resultset('Milk')->create({
-            when_expires => "$expiration 00:00:00"
-         });
-         _fromat({ success => 1 })
-      },
-      sub (/current_tea + ?tea=) {
-         my ($self, $tea_name) = @_;
+   sub (?username=&password=) {
+      my ($self, $username, $password) = @_;
+      return unless verify_password({
+         user     => config->{web_server}{username},
+         password => config->{web_server}{password},
+      }, {
+         user     => $username,
+         password => $password,
+      });
+      sub (POST) {
+         sub (/contacts + ?jid=) {
+            my ($self, $jid) = @_;
+            $schema->resultset('Contact')->create({
+               enabled => 1,
+               jid => $jid
+            });
+            _fromat({ success => 1 })
+         },
+         sub (/teas + ?name=&steep_time=&is_heaping=) {
+            my ($self, $name, $steep_time, $heaping) = @_;
+            $schema->resultset('Tea')->create({
+               name => $name,
+               steep_time => $steep_time,
+               heaping => $heaping,
+               enabled => 1,
+            });
+            _fromat({ success => 1 })
+         },
+         sub (/events + ?name=) {
+            my ($self, $name) = @_;
+            $tea_time_rs->in_order->first->events->create({
+               type => { name => $name }
+            });
+            _fromat({ success => 1 })
+         },
+         sub (/milk + ?expiration=) {
+            my ($self, $expiration) = @_;
+            $schema->resultset('Milk')->create({
+               when_expires => "$expiration 00:00:00"
+            });
+            _fromat({ success => 1 })
+         },
+         sub (/current_tea + ?tea=) {
+            my ($self, $tea_name) = @_;
 
-         my $rs = $schema->resultset('Tea')->cli_find($tea_name);
-         my $count = $rs->count;
-         if ($count > 1) {
-            return _fromat({
-               success => 0,
-               err_code => 2,
-               message => 'More than one tea found',
-               teas    => [map $_->view, $rs->all],
-            });
-         } elsif ($count == 1) {
-            my $tea = $rs->first;
-            $schema->txn_do(sub {
-              my $tt = $tea_time_rs->create({ tea_id => $tea->id });
-              $tt->events->create({
-                type => { name => 'Chose Tea' }
-              });
-            });
-            return _fromat({
-               success => 1,
-               tea => $tea->TO_JSON,
-               milk => $schema->resultset('Milk')->in_order->get_column('when_expires')->first,
-               message => 'Setting tea to ' . $tea->name
-                  . ($tea->heaping ? ' (heaping)' : ''),
+            my $rs = $schema->resultset('Tea')->cli_find($tea_name);
+            my $count = $rs->count;
+            if ($count > 1) {
+               return _fromat({
+                  success => 0,
+                  err_code => 2,
+                  message => 'More than one tea found',
+                  teas    => [map $_->view, $rs->all],
                });
-         } else {
-            return _fromat({
-               success => 0,
-               err_code => 0,
-               message => "No tea '$tea_name' found",
-            });
+            } elsif ($count == 1) {
+               my $tea = $rs->first;
+               $schema->txn_do(sub {
+                 my $tt = $tea_time_rs->create({ tea_id => $tea->id });
+                 $tt->events->create({
+                   type => { name => 'Chose Tea' }
+                 });
+               });
+               return _fromat({
+                  success => 1,
+                  tea => $tea->TO_JSON,
+                  milk => $schema->resultset('Milk')->in_order->get_column('when_expires')->first,
+                  message => 'Setting tea to ' . $tea->name
+                     . ($tea->heaping ? ' (heaping)' : ''),
+                  });
+            } else {
+               return _fromat({
+                  success => 0,
+                  err_code => 0,
+                  message => "No tea '$tea_name' found",
+               });
+            }
          }
-      }
+      },
+      sub (/contacts)   { _fromat([ map $_->TO_JSON, $schema->resultset('Contact')->all ]) },
    },
-   sub (/contacts)   { _fromat([ map $_->TO_JSON, $schema->resultset('Contact')->all ]) },
 
    # no auth
    sub (/last_teas)   { $_[0]->last        },

@@ -6,12 +6,16 @@ use Moo;
 extends 'App::Cmd';
 
 use TeaTime::Web::API;
-use Sub::Quote;
 use TeaTime::Util 'config';
 
 has api => (
    is => 'ro',
-   default => quote_sub q{ TeaTime::Web::API->new },
+   default => sub {
+      TeaTime::Web::API->new(
+         username => config->{cli}{username},
+         password => config->{cli}{password},
+      )
+   },
 );
 
 sub send_message {

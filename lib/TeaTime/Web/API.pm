@@ -16,6 +16,15 @@ has api_root => (
    default => quote_sub q{ 'http://localhost:5000' },
 );
 
+has username => (
+   is => 'ro',
+   required => 1,
+);
+
+has password => (
+   is => 'ro',
+   required => 1,
+);
 
 sub _dejson { decode_json($_[0]->{content})->{data} }
 
@@ -29,13 +38,30 @@ sub _build_url {
    "$uri"
 }
 
-sub _post   { $_[0]->http_tiny->request( POST   => $_[0]->_build_url($_[1], $_[2]) ) }
+sub _post   {
+   my ($self, $url, $params) = @_;
+
+   $params = {
+      %$params,
+      username => $self->username,
+      password => $self->password,
+   };
+   $self->http_tiny->request( POST   => $self->_build_url($url, $params) )
+}
 sub _get    { $_[0]->http_tiny->request( GET    => $_[0]->_build_url($_[1], $_[2]) ) }
 sub _put    { $_[0]->http_tiny->request( PUT    => $_[0]->_build_url($_[1], $_[2]) ) }
 sub _delete { $_[0]->http_tiny->request( DELETE => $_[0]->_build_url($_[1], $_[2]) ) }
 
 sub add_contact { $_[0]->_post('/contacts', { jid => $_[1] }) }
-sub get_contacts { _dejson($_[0]->_get('/contacts')) }
+sub get_contacts {
+   my $self = shift;
+   _dejson(
+      $self->_get('/contacts', {
+         username => $self->username,
+         password => $self->password,
+      })
+   )
+}
 
 sub add_event { $_[0]->_post('/events', { name => $_[1] }) }
 

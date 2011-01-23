@@ -11,6 +11,12 @@
    },
    "web_server":{
       "listen_on":"valium.lan.mitsi.com",
-      "base_url":"/api"
+      "base_url":"/api",
+      "username": "admin",
+      "password": "vc/PXMrik/tMxFxSJbXIUSVZ33ISghU=;TTgUDHvKlCDfJjyh"
+   },
+   "cli": {
+      "username": "admin",
+      "password": "trest"
    }
 }
