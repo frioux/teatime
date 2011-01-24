@@ -17,11 +17,11 @@ my $tea_rs = $schema->resultset('Tea');
 my $tea_time_rs = $schema->resultset('TeaTime');
 my $base_url = config->{web_server}{base_url};
 
-sub rand { _fromat($tea_rs->enabled->rand->single->TO_JSON) }
+sub rand { _success($tea_rs->enabled->rand->single->TO_JSON) }
 
 sub most_rand {
    my @teas = $tea_time_rs->add_count->all;
-   _fromat(choose_weighted(
+   _success(choose_weighted(
       [map $_, @teas],
       [map $_->get_column('count'), @teas]
    )->tea->TO_JSON)
@@ -29,35 +29,41 @@ sub most_rand {
 
 sub least_rand {
    my @teas = $tea_time_rs->add_count->all;
-   _fromat(choose_weighted(
+   _success(choose_weighted(
       [map $_, @teas],
       [map 1/$_->get_column('count'), @teas]
    )->tea->TO_JSON)
 }
 
-sub _fromat {
+sub _success {
    my $s = $base_url;
     [
       200,
       [ 'Content-type', 'application/json; charset=utf-8' ],
       [
-         JSON::encode_json( {
-            data => $_[0],
-            see_also => [split /\s+/, qq($s/stats $s/current_tea $s/last_teas $s/teas
-               $s/rand/most $s/rand/least $s/rand
-            )],
-         })
+         JSON::encode_json( { data => $_[0] })
       ]
     ]
 }
 
-sub main { _fromat([ map $_->TO_JSON, $tea_time_rs->in_order->all ]) }
+sub _fail {
+   my $s = $base_url;
+    [
+      500,
+      [ 'Content-type', 'application/json; charset=utf-8' ],
+      [
+         JSON::encode_json( { data => $_[0] })
+      ]
+    ]
+}
 
-sub last { _fromat([ map $_->TO_JSON, $tea_time_rs->in_order->slice(0, 10)->all ]) }
+sub main { _success([ map $_->TO_JSON, $tea_time_rs->in_order->all ]) }
+
+sub last { _success([ map $_->TO_JSON, $tea_time_rs->in_order->slice(0, 10)->all ]) }
 
 sub teas {
    my $t = time;
-   _fromat([
+   _success([
       map +{
          %{ $_->TO_JSON },
          last_drank => ($_->get_column('last_drank')?duration($t - $_->get_column('last_drank')):undef),
@@ -76,10 +82,10 @@ sub teas {
 }
 
 sub current_tea {
-   _fromat($tea_time_rs->in_order->search(undef, { rows => 1})->single->TO_JSON)
+   _success($tea_time_rs->in_order->search(undef, { rows => 1})->single->TO_JSON)
 }
 
-sub stats { _fromat([ $tea_time_rs->stats->all ]) }
+sub stats { _success([ $tea_time_rs->stats->all ]) }
 
 use MIME::Base64;
 use Crypt::Eksblowfish::Bcrypt 'bcrypt_hash';
@@ -116,7 +122,7 @@ sub dispatch_request {
                enabled => 1,
                jid => $jid
             });
-            _fromat({ success => 1 })
+            _success({})
          },
          sub (/teas + ?name=&steep_time=&is_heaping=) {
             my ($self, $name, $steep_time, $heaping) = @_;
@@ -126,21 +132,21 @@ sub dispatch_request {
                heaping => $heaping,
                enabled => 1,
             });
-            _fromat({ success => 1 })
+            _success({})
          },
          sub (/events + ?name=) {
             my ($self, $name) = @_;
             $tea_time_rs->in_order->first->events->create({
                type => { name => $name }
             });
-            _fromat({ success => 1 })
+            _success({})
          },
          sub (/milk + ?expiration=) {
             my ($self, $expiration) = @_;
             $schema->resultset('Milk')->create({
                when_expires => "$expiration 00:00:00"
             });
-            _fromat({ success => 1 })
+            _success({})
          },
          sub (/current_tea + ?tea=) {
             my ($self, $tea_name) = @_;
@@ -148,12 +154,11 @@ sub dispatch_request {
             my $rs = $schema->resultset('Tea')->cli_find($tea_name);
             my $count = $rs->count;
             if ($count > 1) {
-               return _fromat({
-                  success => 0,
+               return _fail({
                   err_code => 2,
                   message => 'More than one tea found',
                   teas    => [map $_->view, $rs->all],
-               });
+               })
             } elsif ($count == 1) {
                my $tea = $rs->first;
                $schema->txn_do(sub {
@@ -162,23 +167,21 @@ sub dispatch_request {
                    type => { name => 'Chose Tea' }
                  });
                });
-               return _fromat({
-                  success => 1,
+               return _success({
                   tea => $tea->TO_JSON,
                   milk => $schema->resultset('Milk')->in_order->get_column('when_expires')->first,
                   message => 'Setting tea to ' . $tea->name
                      . ($tea->heaping ? ' (heaping)' : ''),
                   });
             } else {
-               return _fromat({
-                  success => 0,
+               return _fail({
                   err_code => 0,
                   message => "No tea '$tea_name' found",
                });
             }
          }
       },
-      sub (/contacts)   { _fromat([ map $_->TO_JSON, $schema->resultset('Contact')->all ]) },
+      sub (/contacts)   { _success([ map $_->TO_JSON, $schema->resultset('Contact')->all ]) },
    },
 
    # no auth
