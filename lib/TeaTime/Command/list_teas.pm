@@ -13,7 +13,7 @@ sub execute {
   my $x = 0;
   print join '', map sprintf("%2d. %s %s\n", ++$x, ($_->{enabled}?'*':' '), $_->{name}),
     sort { $b->{enabled} cmp $a->{enabled} or $a->{name} cmp $b->{name} }
-    @{$self->app->api->get_tea},
+    @{$self->app->api->get_tea->{json}{data}},
 }
 
 1;

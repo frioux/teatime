@@ -26,8 +26,6 @@ has password => (
    required => 1,
 );
 
-sub _dejson { decode_json($_[0]->{content})->{data} }
-
 sub _build_url {
    my ($self, $url, $params) = @_;
 
@@ -46,21 +44,33 @@ sub _post   {
       username => $self->username,
       password => $self->password,
    };
-   $self->http_tiny->request( POST   => $self->_build_url($url, $params) )
+   my $ret = $self->http_tiny->request( POST   => $self->_build_url($url, $params) );
+   $ret->{json} = decode_json($ret->{content});
+   $ret;
 }
-sub _get    { $_[0]->http_tiny->request( GET    => $_[0]->_build_url($_[1], $_[2]) ) }
-sub _put    { $_[0]->http_tiny->request( PUT    => $_[0]->_build_url($_[1], $_[2]) ) }
-sub _delete { $_[0]->http_tiny->request( DELETE => $_[0]->_build_url($_[1], $_[2]) ) }
+sub _get    {
+   my $ret = $_[0]->http_tiny->request( GET    => $_[0]->_build_url($_[1], $_[2]) );
+   $ret->{json} = decode_json($ret->{content});
+   $ret;
+}
+sub _put    {
+   my $ret = $_[0]->http_tiny->request( PUT    => $_[0]->_build_url($_[1], $_[2]) );
+   $ret->{json} = decode_json($ret->{content});
+   $ret;
+}
+sub _delete {
+   my $ret = $_[0]->http_tiny->request( DELETE => $_[0]->_build_url($_[1], $_[2]) );
+   $ret->{json} = decode_json($ret->{content});
+   $ret;
+}
 
 sub add_contact { $_[0]->_post('/contacts', { jid => $_[1] }) }
 sub get_contacts {
    my $self = shift;
-   _dejson(
-      $self->_get('/contacts', {
-         username => $self->username,
-         password => $self->password,
-      })
-   )
+   $self->_get('/contacts', {
+      username => $self->username,
+      password => $self->password,
+   })
 }
 
 sub add_event { $_[0]->_post('/events', { name => $_[1] }) }
@@ -75,12 +85,10 @@ sub add_tea {
       is_heaping => $_[3]
    })
 }
-sub get_tea { _dejson($_[0]->_get('/teas')) }
+sub get_tea { $_[0]->_get('/teas') }
 
-sub add_tea_time {
-   decode_json($_[0]->_post('/current_tea', { tea => $_[1] })->{content})
-}
-sub get_tea_times { _dejson($_[0]->_get('/last_teas')) }
-sub get_current_tea_time { _dejson($_[0]->_get('/current_tea')) }
+sub add_tea_time { $_[0]->_post('/current_tea', { tea => $_[1] }) }
+sub get_tea_times { $_[0]->_get('/last_teas') }
+sub get_current_tea_time { $_[0]->_get('/current_tea') }
 
 1;

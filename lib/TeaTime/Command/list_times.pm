@@ -13,7 +13,7 @@ sub execute {
   my $x = 0;
   say sprintf '%s: %s', $_->{events}[0]{when}, $_->{name} for
     sort { $a->{events}[0]{when} cmp $b->{events}[0]{when} }
-    @{$self->app->api->get_tea_times},
+    @{$self->app->api->get_tea_times->{json}{data}},
 }
 
 1;
