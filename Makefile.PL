@@ -19,6 +19,7 @@ requires 'DBIx::Class::TimeStamp';
 requires 'List::Util';
 requires 'File::HomeDir';
 requires 'SQL::Translator';
+requires 'Net::Twitter::Lite';
 
 install_script glob('script/*.pl');
 auto_install;

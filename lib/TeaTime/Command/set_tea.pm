@@ -39,6 +39,11 @@ sub execute {
       });
     });
     say 'Setting tea to ' . $tea->name . ($tea->heaping ? ' (heaping)' : '');
+    $self->app->tweet(
+      sprintf 'Making Tea: %s (%s)',
+        $tea->name,
+        $self->app->config->{servers}{human}
+    );
     $self->app->send_message(
       sprintf 'Tea chosen: %s (%s) (%s)%s',
         $tea->name,
