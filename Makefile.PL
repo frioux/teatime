@@ -1,7 +1,7 @@
 use inc::Module::Install;
 
 name 'teatime';
-
+version 0.1;
 requires 'DBIx::Class';
 requires 'DBIx::Class::Helpers';
 requires 'Starman';
