@@ -4,6 +4,7 @@ use TeaTime -command;
 
 use 5.12.1;
 use warnings;
+no if $] >= 5.018, warnings => 'experimental::smartmatch';
 
 sub abstract { 'initialize (and upgrade) database' }
 
