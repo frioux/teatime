@@ -1,7 +1,3 @@
-use inc::Module::Install;
-
-name 'teatime';
-version 0.1;
 requires 'AnyEvent';
 requires 'AnyEvent::XMPP::Client';
 requires 'App::Cmd';
@@ -25,7 +21,3 @@ requires 'Starman';
 requires 'Term::ReadKey';
 requires 'Time::Duration';
 requires 'Web::Simple';
-
-install_script glob('script/*.pl');
-auto_install;
-WriteAll;
