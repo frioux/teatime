@@ -21,8 +21,6 @@ sub config {
 
    $config->{writable_db}   //= exists $ENV{TDB}   ? $ENV{TDB}   : 1;
 
-   $config->{tweet}         //= exists $ENV{TTWEET}? $ENV{TTWEET}: 1;
-
    $config
 }
 
@@ -85,28 +83,6 @@ sub send_message {
    );
    $cl->start;
    $j->recv unless $passed_j;
-}
-
-sub tweet {
-   my ($self, $message) = @_;
-
-   return unless $self->config->{tweet};
-   require Net::Twitter::Lite;
-   my $nt = Net::Twitter::Lite->new(
-      consumer_key => config->{twitter}{consumer_key},
-      consumer_secret => config->{twitter}{consumer_secret},
-   );
-   $nt->access_token(config->{twitter}{access_token});
-   $nt->access_token_secret(config->{twitter}{access_token_secret});
-   unless ( $nt->authorized ) {
-       say 'Authorize this app at ' . $nt->get_authorization_url . ' and enter the PIN#';
-
-       chomp(my $pin = <STDIN>); # wait for input
-
-       my($access_token, $access_token_secret, $user_id, $screen_name) =
-           $nt->request_access_token(verifier => $pin);
-   }
-   $nt->update($message);
 }
 
 1;

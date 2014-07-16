@@ -10,7 +10,6 @@ requires 'File::HomeDir';
 requires 'JSON';
 requires 'List::Util';
 requires 'List::Util::WeightedChoice';
-requires 'Net::Twitter::Lite';
 requires 'parent';
 requires 'Plack';
 requires 'Plack::Runner';

@@ -33,11 +33,6 @@ In which case C<dbi:SQLite:dbname=$file;sqlite_unicode=1> is sufficient.
 Note that if you B<do> want to use some other database for performance or
 something that is supported.
 
-=item C<twitter>
-
-this will tweet the tea you are making!  Just set C<username> and C<password>
-and you should be golden.
-
 =item C<xmpp>
 
 this allows will instant message people when the tea is chosen and marked
