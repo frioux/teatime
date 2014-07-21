@@ -1,6 +1,8 @@
 package TeaTime::Command::timer;
 use TeaTime -command;
 
+use Capture::Tiny ':all';
+
 use 5.12.1;
 use warnings;
 
@@ -31,7 +33,7 @@ sub execute {
            if ($seconds >= 0) {
               print "\r\x1b[J" . $seconds--;
               my $color = (255 * (($start_seconds - $seconds)/$start_seconds)) . ',0,0';
-              system(qw(/home/frew/Sync/bin/blink1-tool --rgb), $color);
+              capture { system(qw(blink1-tool --rgb), $color) };
            } elsif (!$once) {
               use Term::ReadKey;
               ReadMode 4; # Turn off controls keys

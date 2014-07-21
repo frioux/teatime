@@ -6,6 +6,7 @@ requires 'DBIx::Class';
 requires 'DBIx::Class::Candy';
 requires 'DBIx::Class::Helpers';
 requires 'DBIx::Class::TimeStamp';
+requires 'Capture::Tiny';
 requires 'File::HomeDir';
 requires 'JSON';
 requires 'List::Util';
