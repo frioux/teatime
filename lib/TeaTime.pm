@@ -57,32 +57,30 @@ sub single_item {
 }
 
 sub send_message {
-   my ($self, $message) = @_;
-   require AnyEvent;
-   require AnyEvent::XMPP::Client;
+   my ($self, $message, $loop) = @_;
+   require Net::Async::XMPP::Client;
 
-   my $passed_j = $_[2];
-   my $j;
-   $j = AnyEvent->condvar unless $passed_j;
-   my $cl = AnyEvent::XMPP::Client->new();
-   $cl->add_account(
-     config->{xmpp}{jid}, config->{xmpp}{password}, config->{xmpp}{server},
-     undef, { dont_retrieve_roster => 1 }
+   my $cl = Net::Async::XMPP::Client->new;
+
+   $loop->add($cl);
+
+   $cl->connect(
+     host => config->{xmpp}{server},
+     jid => config->{xmpp}{jid},
+     password => config->{xmpp}{password},
+     on_connected => sub {
+       my $cl = shift;
+
+       for ($contact_rs->enabled->get_column('jid')->all) {
+          $cl->compose(
+            to   => $_,
+            body => $messge,
+          )->send if $self->config->{send_messages};
+          say "Sending $message to $_";
+       }
+       $cl->configure(on_write_finished => sub { $cl->disconnect; $loop->stop });
+     },
    );
-   $cl->reg_cb (
-      session_ready => sub {
-         for ($contact_rs->enabled->get_column('jid')->all) {
-            $cl->send_message($message, $_)
-               if $self->config->{send_messages};
-            say "Sending $message to $_";
-         }
-         $cl->reg_cb(send_buffer_empty => sub { $cl->disconnect });
-      },
-      disconnect => sub { if ($passed_j) { $passed_j->send } else { $j->send } },
-      error => sub { say "ERROR: " . $_[2]->string },
-   );
-   $cl->start;
-   $j->recv unless $passed_j;
 }
 
 1;

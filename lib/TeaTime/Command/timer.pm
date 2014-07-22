@@ -23,13 +23,18 @@ sub execute {
      });
 
      $|++; # print immediately, not after a newline
-     require AnyEvent;
-     my $j = AnyEvent->condvar;
+     require IO::Async::Loop;
+     require IO::Async::Timer::Periodic;
+
+     my $loop = IO::Async::Loop->new;
+
      my $once = 0;
      my $start_seconds = $seconds;
-     my $w = AnyEvent->timer (
-        interval => 1,
-        cb       => sub {
+
+     my $timer = IO::Async::Timer::Periodic->new(
+        first_interval => 0,
+        interval       => 1,
+        on_tick        => sub {
            if ($seconds >= 0) {
               print "\r\x1b[J" . $seconds--;
               my $color = (255 * (($start_seconds - $seconds)/$start_seconds)) . ',0,0';
@@ -54,13 +59,16 @@ sub execute {
                   $self->app->config->{servers}{api},
                   $self->app->config->{servers}{human}
                 ),
-                $j
+                $loop
               );
               $once = 1
            }
         }
      );
-     $j->recv;
+
+     $loop->add($timer->start);
+
+     $loop->run
   })
 }
 

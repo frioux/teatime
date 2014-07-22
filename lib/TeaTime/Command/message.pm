@@ -15,7 +15,12 @@ sub validate_args {
   $self->usage_error('too few arguments') unless scalar @$args >= 1;
 }
 
-sub execute { $_[0]->app->send_message(join q( ), @{$_[2]}) }
+sub execute {
+   require IO::Async::Loop;
+   my $loop = IO::Async::Loop->new;
+   $_[0]->app->send_message((join q( ), @{$_[2]}), $loop);
+   $loop->run
+}
 
 1;
 

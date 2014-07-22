@@ -39,13 +39,17 @@ sub execute {
       });
     });
     say 'Setting tea to ' . $tea->name . ($tea->heaping ? ' (heaping)' : '');
+    require IO::Async::Loop;
+    my $loop = IO::Async::Loop->new;
     $self->app->send_message(
-      sprintf 'Tea chosen: %s (%s) (%s)%s',
+      (sprintf 'Tea chosen: %s (%s) (%s)%s',
         $tea->name,
         $self->app->config->{servers}{api},
         $self->app->config->{servers}{human},
         $milk,
+      ), $loop
     );
+    $loop->run;
   }, 'tea', $args->[0], $self->app->tea_rs->enabled);
 }
 
