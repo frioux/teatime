@@ -78,16 +78,16 @@ use Web::Simple 'TeaTime::Web';
 
    sub stats { _fromat([ $tea_time_rs->stats->all ]) }
 
-   dispatch {
-      sub (/)            { $self->main        },
-      sub (/last_teas)   { $self->last        },
-      sub (/teas)        { $self->teas        },
-      sub (/stats)       { $self->stats       },
-      sub (/current_tea) { $self->current_tea },
-      sub (/rand)        { $self->rand        },
-      sub (/rand/most)   { $self->most_rand   },
-      sub (/rand/least)  { $self->least_rand  },
-   };
+   sub dispatch_request {
+      sub (/)            { $_[0]->main        },
+      sub (/last_teas)   { $_[0]->last        },
+      sub (/teas)        { $_[0]->teas        },
+      sub (/stats)       { $_[0]->stats       },
+      sub (/current_tea) { $_[0]->current_tea },
+      sub (/rand)        { $_[0]->rand        },
+      sub (/rand/most)   { $_[0]->most_rand   },
+      sub (/rand/least)  { $_[0]->least_rand  },
+   }
 }
 
 TeaTime::Web->run_if_script;
