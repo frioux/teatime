@@ -2,6 +2,7 @@ package TeaTime::Command::list_teas;
 
 use 5.20.0;
 use Moo;
+use experimental 'signatures';
 
 extends 'TeaTime::Command';
 
@@ -14,9 +15,7 @@ sub opt_spec {
   );
 }
 
-sub execute {
-  my ($self, $opt, $args) = @_;
-
+sub execute ($self, $opt, $args) {
   my $x = 0;
   my $rs = $self->app->tea_rs;
   if ($opt->order_by_drank) {

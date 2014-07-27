@@ -2,6 +2,7 @@ package TeaTime::Command::server;
 
 use 5.20.0;
 use Moo;
+use experimental 'signatures';
 
 extends 'TeaTime::Command';
 
@@ -9,9 +10,7 @@ use FindBin;
 
 sub abstract { 'run tea server' }
 
-sub execute {
-  my ($self, $opt, $args) = @_;
-
+sub execute ($self, $opt, $args) {
   require Plack::Runner;
   my $runner = Plack::Runner->new(
      server => 'Starman', env => 'deployment'

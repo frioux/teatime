@@ -2,6 +2,7 @@ package TeaTime::Command::timer;
 
 use 5.20.0;
 use Moo;
+use experimental 'signatures';
 
 extends 'TeaTime::Command';
 
@@ -11,9 +12,7 @@ sub abstract { 'run timer for last set tea' }
 
 sub usage_desc { 't timer [time]' }
 
-sub execute {
-  my ($self, $opt, $args) = @_;
-
+sub execute ($self, $opt, $args) {
   my $tea_time = $self->app->tea_time_rs->in_order->first;
 
   my $seconds = $args->[0] || $tea_time->tea->steep_time;

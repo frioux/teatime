@@ -2,6 +2,7 @@ package TeaTime::Command::set_tea;
 
 use 5.20.0;
 use Moo;
+use experimental 'signatures';
 
 extends 'TeaTime::Command';
 
@@ -9,9 +10,7 @@ sub abstract { 'set tea' }
 
 sub usage_desc { 't set_tea <name>' }
 
-sub execute {
-  my ($self, $opt, $args) = @_;
-
+sub execute ($self, $opt, $args) {
   require DateTime;
   my $milk = (sub {
     my $days = int($self->app->schema->resultset('Milk')->in_order->first

@@ -3,7 +3,7 @@ package TeaTime::Command::init;
 use 5.20.0;
 use Moo;
 use warnings NONFATAL => 'all';
-use experimental 'switch';
+use experimental 'switch', 'signatures';
 
 extends 'TeaTime::Command';
 
@@ -11,15 +11,11 @@ sub abstract { 'initialize (and upgrade) database' }
 
 sub usage_desc { 't init [version]' }
 
-sub validate_args {
-  my ($self, $opt, $args) = @_;
-
+sub validate_args ($self, $opt, $args) {
   $self->usage_error('init version must be an int') unless $args->[0] =~ /^\d+$/;
 }
 
-sub execute {
-  my ($self, $opt, $args) = @_;
-
+sub execute ($self, $opt, $args) {
   my $schema = $self->app->schema;
   given ($args->[0]) {
     when (2) {

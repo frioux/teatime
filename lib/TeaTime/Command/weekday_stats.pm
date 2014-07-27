@@ -2,6 +2,7 @@ package TeaTime::Command::weekday_stats;
 
 use 5.20.0;
 use Moo;
+use experimental 'signatures';
 
 extends 'TeaTime::Command';
 
@@ -9,11 +10,7 @@ sub abstract { 'get stats based on weekday' }
 
 sub usage_desc { 't weekday_stats' }
 
-my @days = ();
-
-sub execute {
-  my ($self, $opt, $args) = @_;
-
+sub execute ($self, $opt, $args) {
   my %teas;
   $teas{$_->{tea}}[$_->{weekday}] = $_->{count} for $self->app->tea_time_rs->search(undef, {
     result_class => 'DBIx::Class::ResultClass::HashRefInflator',

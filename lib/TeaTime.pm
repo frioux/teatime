@@ -2,6 +2,7 @@ package TeaTime;
 
 use 5.20.0;
 use Moo;
+use experimental 'signatures';
 
 extends 'App::Cmd';
 
@@ -41,24 +42,22 @@ has connect_info => (
    },
 );
 
-sub _build_schema {
+sub _build_schema ($self) {
    require TeaTime::Schema;
 
    my $s = TeaTime::Schema->connect({
       quote_names => 1,
-      %{ $_[0]->connect_info },
+      %{ $self->connect_info },
    });
 
    $s
 }
 
-sub tea_rs { shift->schema->resultset('Tea') }
-sub tea_time_rs { shift->schema->resultset('TeaTime') }
-sub contact_rs { shift->schema->resultset('Contact') }
+sub tea_rs ($s) { $s->schema->resultset('Tea') }
+sub tea_time_rs ($s) { $s->schema->resultset('TeaTime') }
+sub contact_rs ($s) { $s->schema->resultset('Contact') }
 
-sub single_item {
-   my ($self, $action, $name, $arg, $rs) = @_;
-
+sub single_item ($self, $action, $name, $arg, $rs) {
    $rs = $rs->cli_find($arg);
    my $count = $rs->count;
    if ($count > 1) {
@@ -74,12 +73,10 @@ sub single_item {
    }
 }
 
-sub send_message {
-   my ($self, $message) = @_;
+sub send_message ($self, $message, $passed_j = undef) {
    require AnyEvent;
    require AnyEvent::XMPP::Client;
 
-   my $passed_j = $_[2];
    my $j;
    $j = AnyEvent->condvar unless $passed_j;
    my $cl = AnyEvent::XMPP::Client->new();
