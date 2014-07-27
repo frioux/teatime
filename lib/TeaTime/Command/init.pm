@@ -3,6 +3,7 @@ package TeaTime::Command::init;
 use 5.20.0;
 use Moo;
 use warnings NONFATAL => 'all';
+use experimental 'switch';
 
 extends 'TeaTime::Command';
 
