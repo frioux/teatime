@@ -24,19 +24,37 @@ sub config {
    $config
 }
 
-my $schema = TeaTime::Schema->connect({
-   dsn      => config->{db},
-   writable => config->{writable_db},
-});
+has schema => (
+   is => 'ro',
+   builder => '_build_schema',
+   lazy => 1,
+);
 
-my $tea_rs = $schema->resultset('Tea');
-my $tea_time_rs = $schema->resultset('TeaTime');
-my $contact_rs = $schema->resultset('Contact');
+has connect_info => (
+   is => 'ro',
+   required => 1,
+   default => sub {
+      +{
+         dsn      => config->{db},
+         writable => config->{writable_db},
+      }
+   },
+);
 
-sub schema { $schema }
-sub tea_rs { $tea_rs }
-sub tea_time_rs { $tea_time_rs }
-sub contact_rs { $contact_rs }
+sub _build_schema {
+   require TeaTime::Schema;
+
+   my $s = TeaTime::Schema->connect({
+      quote_names => 1,
+      %{ $_[0]->connect_info },
+   });
+
+   $s
+}
+
+sub tea_rs { shift->schema->resultset('Tea') }
+sub tea_time_rs { shift->schema->resultset('TeaTime') }
+sub contact_rs { shift->schema->resultset('Contact') }
 
 sub single_item {
    my ($self, $action, $name, $arg, $rs) = @_;
@@ -71,7 +89,7 @@ sub send_message {
    );
    $cl->reg_cb (
       session_ready => sub {
-         for ($contact_rs->enabled->get_column('jid')->all) {
+         for ($self->contact_rs->enabled->get_column('jid')->all) {
             $cl->send_message($message, $_)
                if $self->config->{send_messages};
             say "Sending $message to $_";
