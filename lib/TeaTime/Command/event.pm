@@ -1,9 +1,9 @@
 package TeaTime::Command::event;
 
-use TeaTime -command;
+use 5.20.0;
+use Moo;
 
-use 5.12.1;
-use warnings;
+extends 'TeaTime::Command';
 
 sub abstract { 'mark pot with arbitrary event' }
 

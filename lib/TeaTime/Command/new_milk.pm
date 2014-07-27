@@ -1,9 +1,9 @@
 package TeaTime::Command::new_milk;
 
-use TeaTime -command;
+use 5.20.0;
+use Moo;
 
-use 5.12.1;
-use warnings;
+extends 'TeaTime::Command';
 
 sub abstract { 'add new milk for expiration date tracking' }
 

@@ -1,9 +1,9 @@
 package TeaTime;
 
-use App::Cmd::Setup -app;
+use 5.20.0;
+use Moo;
 
-use 5.12.1;
-use warnings;
+extends 'App::Cmd';
 
 use TeaTime::Schema;
 use JSON;
@@ -83,6 +83,26 @@ sub send_message {
    );
    $cl->start;
    $j->recv unless $passed_j;
+}
+
+sub _plugins {
+   "TeaTime::Command::create_contact",
+   "TeaTime::Command::create_tea",
+   "TeaTime::Command::empty",
+   "TeaTime::Command::event",
+   "TeaTime::Command::init",
+   "TeaTime::Command::list_contacts",
+   "TeaTime::Command::list_teas",
+   "TeaTime::Command::list_times",
+   "TeaTime::Command::message",
+   "TeaTime::Command::new_milk",
+   "TeaTime::Command::server",
+   "TeaTime::Command::set_tea",
+   "TeaTime::Command::timer",
+   "TeaTime::Command::toggle_contact",
+   "TeaTime::Command::toggle_tea",
+   "TeaTime::Command::undo",
+   "TeaTime::Command::weekday_stats",
 }
 
 1;

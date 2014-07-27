@@ -1,10 +1,10 @@
 package TeaTime::Command::init;
 
-use TeaTime -command;
+use 5.20.0;
+use Moo;
+use warnings NONFATAL => 'all';
 
-use 5.12.1;
-use warnings;
-no if $] >= 5.018, warnings => 'experimental::smartmatch';
+extends 'TeaTime::Command';
 
 sub abstract { 'initialize (and upgrade) database' }
 

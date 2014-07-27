@@ -1,10 +1,11 @@
 package TeaTime::Command::server;
 
-use TeaTime -command;
+use 5.20.0;
+use Moo;
+
+extends 'TeaTime::Command';
 
 use FindBin;
-use 5.12.1;
-use warnings;
 
 sub abstract { 'run tea server' }
 
