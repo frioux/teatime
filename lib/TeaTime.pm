@@ -77,27 +77,30 @@ sub send_message ($self, $message, $passed_j = undef) {
    require AnyEvent;
    require AnyEvent::XMPP::Client;
 
-   my $j;
-   $j = AnyEvent->condvar unless $passed_j;
-   my $cl = AnyEvent::XMPP::Client->new();
-   $cl->add_account(
-     config->{xmpp}{jid}, config->{xmpp}{password}, config->{xmpp}{server},
-     undef, { dont_retrieve_roster => 1 }
-   );
-   $cl->reg_cb (
-      session_ready => sub {
-         for ($self->contact_rs->enabled->get_column('jid')->all) {
-            $cl->send_message($message, $_)
-               if $self->config->{send_messages};
-            say "Sending $message to $_";
-         }
-         $cl->reg_cb(send_buffer_empty => sub { $cl->disconnect });
-      },
-      disconnect => sub { if ($passed_j) { $passed_j->send } else { $j->send } },
-      error => sub { say "ERROR: " . $_[2]->string },
-   );
-   $cl->start;
-   $j->recv unless $passed_j;
+   if ($self->config->{send_messages}) {
+      my $j;
+      $j = AnyEvent->condvar unless $passed_j;
+      my $cl = AnyEvent::XMPP::Client->new();
+      $cl->add_account(
+        config->{xmpp}{jid}, config->{xmpp}{password}, config->{xmpp}{server},
+        undef, { dont_retrieve_roster => 1 }
+      );
+      $cl->reg_cb (
+         session_ready => sub {
+            for ($self->contact_rs->enabled->get_column('jid')->all) {
+               $cl->send_message($message, $_);
+               say "Sending $message to $_";
+            }
+            $cl->reg_cb(send_buffer_empty => sub { $cl->disconnect });
+         },
+         disconnect => sub { if ($passed_j) { $passed_j->send } else { $j->send } },
+         error => sub { say "ERROR: " . $_[2]->string },
+      );
+      $cl->start;
+      $j->recv unless $passed_j;
+   } else {
+      $passed_j->send if $passed_j
+   }
 }
 
 sub _plugins {
