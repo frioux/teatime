@@ -1,5 +1,10 @@
 package TeaTime::Schema::ResultSet::Tea;
 
+use 5.20.0;
+use warnings;
+
+use experimental 'signatures';
+
 use parent 'TeaTime::Schema::ResultSet';
 __PACKAGE__->load_components(qw(
    Helper::ResultSet::Random
@@ -7,6 +12,8 @@ __PACKAGE__->load_components(qw(
 ));
 
 sub cli_find { $_[0]->search({ name => { -like => "%$_[1]%" } }) }
+
+sub find_by_name ($s, $n) { $s->search({ name => $n }) }
 
 sub enabled { $_[0]->search({ enabled => 1}) }
 
