@@ -23,4 +23,22 @@ ok(
    'definitely created contact',
 );
 
+stdout_is(
+   test_app($app => [qw(list_contacts)]),
+   [ '1. foo@bar.com'],
+   'list_contacts',
+);
+
+stdout_is(
+   test_app($app => [qw(toggle_contact foo)]),
+   [ 'Toggling foo@bar.com to disabled'],
+   'toggle_contact',
+);
+
+stdout_is(
+   test_app($app => [qw(toggle_contact foo)]),
+   [ 'Toggling foo@bar.com to enabled'],
+   'toggle_contact',
+);
+
 done_testing;
